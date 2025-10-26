@@ -6,12 +6,11 @@ use App\Enum\ProductCategory;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Table;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
-#[Table('products')]
+#[ORM\Table('products')]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[Gedmo\SoftDeleteable]
 class Product
