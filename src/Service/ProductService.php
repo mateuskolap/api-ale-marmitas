@@ -61,6 +61,13 @@ readonly class ProductService
         return new ProductOutput($product);
     }
 
+    /**
+     * Update an existing product
+     *
+     * @param ProductUpdateInput $input
+     * @param Product $product
+     * @return ProductOutput
+     */
     public function update(ProductUpdateInput $input, Product $product): ProductOutput
     {
         if ($input->name) {
@@ -80,6 +87,12 @@ readonly class ProductService
         return new ProductOutput($product);
     }
 
+    /**
+     * Delete a product
+     *
+     * @param Product $product
+     * @return void
+     */
     public function delete(Product $product): void
     {
         $this->productRepository->delete($product, true);
