@@ -26,9 +26,9 @@ final class ProductController extends AbstractController
     }
 
     #[Route(name: "list", methods: ["GET"])]
-    public function list(#[MapQueryString] PaginationOptions $options): Response
+    public function list(#[MapQueryString] PaginationOptions $options): JsonResponse
     {
-        return $this->json($this->productService->findAllPaginated($options->page, $options->size));
+        return $this->json($this->productService->findAllPaginated($options));
     }
 
     #[Route(name: "create", methods: ["POST"])]

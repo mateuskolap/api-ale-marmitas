@@ -22,7 +22,7 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all product query
+     * Find all products query
      *
      * @return Query
      */

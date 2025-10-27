@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\Product\ProductCreateInput;
 use App\DTO\Input\Product\ProductUpdateInput;
 use App\DTO\Output\PaginatedList;
@@ -23,16 +24,15 @@ readonly class ProductService
     /**
      * Find all products with pagination
      *
-     * @param int $page
-     * @param int $size
+     * @param PaginationOptions $options
      * @return PaginatedList
      */
-    public function findAllPaginated(int $page, int $size): PaginatedList
+    public function findAllPaginated(PaginationOptions $options): PaginatedList
     {
         $pagination = $this->paginator->paginate(
             $this->productRepository->findAllQuery(),
-            $page,
-            $size
+            $options->page,
+            $options->size
         );
 
         $pagination->setItems(array_map(
