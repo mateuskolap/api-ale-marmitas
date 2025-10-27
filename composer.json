@@ -14,6 +14,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.5",
         "doctrine/orm": "^3.5",
         "knplabs/knp-paginator-bundle": "^6.9",
+        "lexik/jwt-authentication-bundle": "^3.1",
         "muffe/enum-constraint": "^0.2.1",
         "nelmio/cors-bundle": "^2.6",
         "phpdocumentor/reflection-docblock": "^5.6",
