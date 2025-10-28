@@ -4,8 +4,10 @@ namespace App\Controller\Api\v1;
 
 use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\User\UserCreateInput;
+use App\DTO\Input\User\UserFilterInput;
 use App\DTO\Input\User\UserUpdateInput;
 use App\Entity\User;
+use App\Enum\Role;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +17,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted(Role::ADMIN->value)]
 #[Route('/api/v1/users', name: 'app_api_v1_users_')]
 final class UserController extends AbstractController
 {
@@ -26,9 +28,12 @@ final class UserController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(#[MapQueryString] PaginationOptions $options): JsonResponse
+    public function list(
+        #[MapQueryString] PaginationOptions $options,
+        #[MapQueryString] UserFilterInput $filters,
+    ): JsonResponse
     {
-        return $this->json($this->userService->findAllPaginated($options));
+        return $this->json($this->userService->findAllPaginated($options, $filters));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

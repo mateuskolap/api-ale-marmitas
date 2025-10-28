@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\Input\Product\ProductFilterInput;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,12 +25,17 @@ class ProductRepository extends ServiceEntityRepository
     /**
      * Find all product query
      *
+     * @param ProductFilterInput|null $filters
      * @return Query
      */
-    public function findAllQuery(): Query
+    public function findFilteredQuery(?ProductFilterInput $filters = null): Query
     {
-        return $this->createQueryBuilder('p')
-            ->getQuery();
+        $qb = $this->createQueryBuilder('p');
+
+        $filters->name && $qb->andWhere('p.name LIKE :name')->setParameter('name', '%' . $filters->name . '%');
+        $filters->category && $qb->andWhere('p.category = :category')->setParameter('category', $filters->category);
+
+        return $qb->getQuery();
     }
 
     /**

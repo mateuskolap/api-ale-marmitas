@@ -4,8 +4,10 @@ namespace App\Controller\Api\v1;
 
 use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\Product\ProductCreateInput;
+use App\DTO\Input\Product\ProductFilterInput;
 use App\DTO\Input\Product\ProductUpdateInput;
 use App\Entity\Product;
+use App\Enum\Role;
 use App\Service\ProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +17,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted(Role::ADMIN->value)]
 #[Route("/api/v1/products", name: "app_api_v1_products_")]
 final class ProductController extends AbstractController
 {
@@ -26,9 +28,12 @@ final class ProductController extends AbstractController
     }
 
     #[Route(name: "list", methods: ["GET"])]
-    public function list(#[MapQueryString] PaginationOptions $options): JsonResponse
+    public function list(
+        #[MapQueryString] PaginationOptions $options,
+        #[MapQueryString] ProductFilterInput $filters,
+    ): JsonResponse
     {
-        return $this->json($this->productService->findAllPaginated($options));
+        return $this->json($this->productService->findAllPaginated($options, $filters));
     }
 
     #[Route(name: "create", methods: ["POST"])]

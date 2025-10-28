@@ -3,7 +3,9 @@
 namespace App\Service;
 
 use App\DTO\Input\PaginationOptions;
+use App\DTO\Input\Product\ProductFilterInput;
 use App\DTO\Input\User\UserCreateInput;
+use App\DTO\Input\User\UserFilterInput;
 use App\DTO\Input\User\UserUpdateInput;
 use App\DTO\Output\PaginatedList;
 use App\DTO\Output\User\UserOutput;
@@ -28,12 +30,13 @@ readonly class UserService
      * Find all users with pagination
      *
      * @param PaginationOptions $options
+     * @param UserFilterInput|null $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $options): PaginatedList
+    public function findAllPaginated(PaginationOptions $options, ?UserFilterInput $filters = null): PaginatedList
     {
         $pagination = $this->paginator->paginate(
-            $this->userRepository->findAllQuery(),
+            $this->userRepository->findFilteredQuery($filters),
             $options->page,
             $options->size
         );

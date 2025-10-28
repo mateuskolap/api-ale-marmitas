@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\Product\ProductCreateInput;
+use App\DTO\Input\Product\ProductFilterInput;
 use App\DTO\Input\Product\ProductUpdateInput;
 use App\DTO\Output\PaginatedList;
 use App\DTO\Output\Product\ProductOutput;
@@ -25,12 +26,13 @@ readonly class ProductService
      * Find all products with pagination
      *
      * @param PaginationOptions $options
+     * @param ProductFilterInput|null $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $options): PaginatedList
+    public function findAllPaginated(PaginationOptions $options, ?ProductFilterInput $filters = null): PaginatedList
     {
         $pagination = $this->paginator->paginate(
-            $this->productRepository->findAllQuery(),
+            $this->productRepository->findFilteredQuery($filters),
             $options->page,
             $options->size
         );
@@ -70,17 +72,9 @@ readonly class ProductService
      */
     public function update(ProductUpdateInput $input, Product $product): ProductOutput
     {
-        if ($input->name) {
-            $product->setName($input->name);
-        }
-
-        if ($input->price) {
-            $product->setPrice($input->price);
-        }
-
-        if ($input->category) {
-            $product->setCategory(ProductCategory::from($input->category));
-        }
+        $input->name && $product->setName($input->name);
+        $input->price && $product->setPrice($input->price);
+        $input->category && $product->setCategory(ProductCategory::from($input->category));
 
         $this->productRepository->save($product, true);
 

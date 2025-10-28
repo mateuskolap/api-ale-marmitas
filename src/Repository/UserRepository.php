@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\Input\User\UserFilterInput;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,12 +28,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * Find all users query
      *
+     * @param UserFilterInput|null $filters
      * @return Query
      */
-    public function findAllQuery(): Query
+    public function findFilteredQuery(?UserFilterInput $filters = null): Query
     {
-        return $this->createQueryBuilder('u')
-            ->getQuery();
+        $qb = $this->createQueryBuilder('u');
+
+        $filters->email && $qb->andWhere('u.email LIKE :email')->setParameter('email', '%' . $filters->email . '%');
+        $filters->role && $qb->andWhere('u.roles LIKE :role')->setParameter('role', '%' . $filters->role . '%');
+
+        return $qb->getQuery();
     }
 
     /**
