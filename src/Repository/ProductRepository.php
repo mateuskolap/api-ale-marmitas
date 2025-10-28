@@ -22,7 +22,7 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all products query
+     * Find all product query
      *
      * @return Query
      */
@@ -55,7 +55,7 @@ class ProductRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return void
      */
-    public function delete(Product $product, bool $flush = true): void
+    public function delete(Product $product, bool $flush = false): void
     {
         $this->em->remove($product);
 

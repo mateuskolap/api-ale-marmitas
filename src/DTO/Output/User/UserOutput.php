@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Output\Product;
+namespace App\DTO\Output\User;
 
 use App\Entity\User;
 

@@ -4,8 +4,9 @@ namespace App\Service;
 
 use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\User\UserCreateInput;
+use App\DTO\Input\User\UserUpdateInput;
 use App\DTO\Output\PaginatedList;
-use App\DTO\Output\Product\UserOutput;
+use App\DTO\Output\User\UserOutput;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
@@ -54,7 +55,7 @@ readonly class UserService
     public function create(UserCreateInput $input): UserOutput
     {
         $this->userRepository->findOneBy(['email' => $input->email])
-        && throw new \InvalidArgumentException('User with this email already exists.', Response::HTTP_BAD_REQUEST);
+            && throw new \InvalidArgumentException('User with this email already exists.', Response::HTTP_BAD_REQUEST);
 
         $user = (new User())
             ->setEmail($input->email)
@@ -64,5 +65,41 @@ readonly class UserService
         $this->userRepository->save($user, true);
 
         return new UserOutput($user);
+    }
+
+    /**
+     * Update an existing user
+     *
+     * @param UserUpdateInput $input
+     * @param User $user
+     * @return UserOutput
+     */
+    public function update(UserUpdateInput $input, User $user): UserOutput
+    {
+        if ($input->email) {
+            $user->setEmail($input->email);
+        }
+
+        if ($input->roles) {
+            $user->setRoles($input->roles);
+        }
+
+        if ($input->password) {
+            $user->setPassword($this->hasher->hashPassword($user, $input->password));
+        }
+
+        $this->userRepository->save($user, true);
+
+        return new UserOutput($user);
+    }
+
+    /**
+     * Delete a user
+     *
+     * @param User $user
+     */
+    public function delete(User $user): void
+    {
+        $this->userRepository->delete($user, true);
     }
 }

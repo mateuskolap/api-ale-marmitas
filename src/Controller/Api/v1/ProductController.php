@@ -34,7 +34,7 @@ final class ProductController extends AbstractController
     #[Route(name: "create", methods: ["POST"])]
     public function create(#[MapRequestPayload] ProductCreateInput $input): JsonResponse
     {
-        return $this->json($this->productService->create($input));
+        return $this->json($this->productService->create($input), Response::HTTP_CREATED);
     }
 
     #[Route('/{product}', name: "update", methods: ["PATCH"])]
