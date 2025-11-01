@@ -8,6 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
+#[ORM\Table('order_products')]
 #[ORM\Entity]
 #[Gedmo\SoftDeleteable]
 class OrderProduct

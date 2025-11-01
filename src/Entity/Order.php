@@ -12,6 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
+#[ORM\Table('orders')]
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[Gedmo\SoftDeleteable]
 class Order
@@ -36,7 +37,7 @@ class Order
     /**
      * @var Collection<int, OrderProduct>
      */
-    #[ORM\OneToMany(targetEntity: OrderProduct::class, mappedBy: 'orderRef', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: OrderProduct::class, mappedBy: 'order', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $orderProducts;
 
     public function __construct()
@@ -97,7 +98,7 @@ class Order
     {
         if (!$this->orderProducts->contains($orderProduct)) {
             $this->orderProducts->add($orderProduct);
-            $orderProduct->setOrderRef($this);
+            $orderProduct->setOrder($this);
         }
 
         return $this;
@@ -106,9 +107,8 @@ class Order
     public function removeOrderProduct(OrderProduct $orderProduct): static
     {
         if ($this->orderProducts->removeElement($orderProduct)) {
-            // set the owning side to null (unless already changed)
-            if ($orderProduct->getOrderRef() === $this) {
-                $orderProduct->setOrderRef(null);
+            if ($orderProduct->getOrder() === $this) {
+                $orderProduct->setOrder(null);
             }
         }
 

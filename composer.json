@@ -32,7 +32,8 @@
         "symfony/security-bundle": "7.3.*",
         "symfony/serializer": "7.3.*",
         "symfony/validator": "7.3.*",
-        "symfony/yaml": "7.3.*"
+        "symfony/yaml": "7.3.*",
+        "ext-bcmath": "*"
     },
     "config": {
         "allow-plugins": {

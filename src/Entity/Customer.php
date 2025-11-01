@@ -10,6 +10,7 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Gedmo\Mapping\Annotation as Gedmo;
 
+#[ORM\Table('customers')]
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[Gedmo\SoftDeleteable]
 class Customer
