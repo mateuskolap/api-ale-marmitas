@@ -29,11 +29,11 @@ final class UserController extends AbstractController
 
     #[Route(name: 'list', methods: ['GET'])]
     public function list(
-        #[MapQueryString] PaginationOptions $options,
+        #[MapQueryString] PaginationOptions $pagination,
         #[MapQueryString] UserFilterInput $filters,
     ): JsonResponse
     {
-        return $this->json($this->userService->findAllPaginated($options, $filters));
+        return $this->json($this->userService->findAllPaginated($pagination, $filters));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

@@ -29,16 +29,16 @@ readonly class UserService
     /**
      * Find all users with pagination
      *
-     * @param PaginationOptions $options
+     * @param PaginationOptions $pagination
      * @param UserFilterInput|null $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $options, ?UserFilterInput $filters = null): PaginatedList
+    public function findAllPaginated(PaginationOptions $pagination, ?UserFilterInput $filters = null): PaginatedList
     {
         $pagination = $this->paginator->paginate(
             $this->userRepository->findFilteredQuery($filters),
-            $options->page,
-            $options->size
+            $pagination->page,
+            $pagination->size
         );
 
         $pagination->setItems(array_map(

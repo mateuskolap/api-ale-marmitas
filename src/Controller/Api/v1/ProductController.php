@@ -17,8 +17,8 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted(Role::ADMIN->value)]
-#[Route("/api/v1/products", name: "app_api_v1_products_")]
+#[IsGranted(Role::MANAGER->value)]
+#[Route('/api/v1/products', name: 'app_api_v1_products_')]
 final class ProductController extends AbstractController
 {
     public function __construct(
@@ -27,28 +27,28 @@ final class ProductController extends AbstractController
     {
     }
 
-    #[Route(name: "list", methods: ["GET"])]
+    #[Route(name: 'list', methods: ['GET'])]
     public function list(
-        #[MapQueryString] PaginationOptions $options,
+        #[MapQueryString] PaginationOptions  $pagination,
         #[MapQueryString] ProductFilterInput $filters,
     ): JsonResponse
     {
-        return $this->json($this->productService->findAllPaginated($options, $filters));
+        return $this->json($this->productService->findAllPaginated($pagination, $filters));
     }
 
-    #[Route(name: "create", methods: ["POST"])]
+    #[Route(name: 'create', methods: ['POST'])]
     public function create(#[MapRequestPayload] ProductCreateInput $input): JsonResponse
     {
         return $this->json($this->productService->create($input), Response::HTTP_CREATED);
     }
 
-    #[Route('/{product}', name: "update", methods: ["PATCH"])]
+    #[Route('/{product}', name: 'update', methods: ['PATCH'])]
     public function update(#[MapRequestPayload] ProductUpdateInput $input, Product $product): JsonResponse
     {
         return $this->json($this->productService->update($input, $product));
     }
 
-    #[Route('/{product}', name: "delete", methods: ["DELETE"])]
+    #[Route('/{product}', name: 'delete', methods: ['DELETE'])]
     public function delete(Product $product): JsonResponse
     {
         $this->productService->delete($product);
