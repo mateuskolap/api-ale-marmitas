@@ -6,6 +6,7 @@ use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\User\UserCreateInput;
 use App\DTO\Input\User\UserFilterInput;
 use App\DTO\Input\User\UserUpdateInput;
+use App\DTO\Output\User\UserOutput;
 use App\Entity\User;
 use App\Enum\Role;
 use App\Service\UserService;
@@ -34,6 +35,12 @@ final class UserController extends AbstractController
     ): JsonResponse
     {
         return $this->json($this->userService->findAllPaginated($pagination, $filters));
+    }
+
+    #[Route('/{user}', name: 'show', methods: ['GET'])]
+    public function show(User $user): JsonResponse
+    {
+        return $this->json(new UserOutput($user));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

@@ -6,6 +6,7 @@ use App\DTO\Input\Customer\CustomerCreateInput;
 use App\DTO\Input\Customer\CustomerFilterInput;
 use App\DTO\Input\Customer\CustomerUpdateInput;
 use App\DTO\Input\PaginationOptions;
+use App\DTO\Output\Customer\CustomerOutput;
 use App\Entity\Customer;
 use App\Enum\Role;
 use App\Service\CustomerService;
@@ -34,6 +35,12 @@ final class CustomerController extends AbstractController
     ): JsonResponse
     {
         return $this->json($this->customerService->findAllPaginated($pagination, $filters));
+    }
+
+    #[Route('/{customer}', name: 'show', methods: ['GET'])]
+    public function show(Customer $customer): JsonResponse
+    {
+        return $this->json(new CustomerOutput($customer));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

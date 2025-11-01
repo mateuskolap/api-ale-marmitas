@@ -6,6 +6,7 @@ use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\Product\ProductCreateInput;
 use App\DTO\Input\Product\ProductFilterInput;
 use App\DTO\Input\Product\ProductUpdateInput;
+use App\DTO\Output\Product\ProductOutput;
 use App\Entity\Product;
 use App\Enum\Role;
 use App\Service\ProductService;
@@ -34,6 +35,12 @@ final class ProductController extends AbstractController
     ): JsonResponse
     {
         return $this->json($this->productService->findAllPaginated($pagination, $filters));
+    }
+
+    #[Route('/{product}', name: 'show', methods: ['GET'])]
+    public function show(Product $product): JsonResponse
+    {
+        return $this->json(new ProductOutput($product));
     }
 
     #[Route(name: 'create', methods: ['POST'])]
