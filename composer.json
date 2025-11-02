@@ -5,6 +5,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.2",
+        "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/doctrine-orm": "^4.2",
@@ -32,8 +33,7 @@
         "symfony/security-bundle": "7.3.*",
         "symfony/serializer": "7.3.*",
         "symfony/validator": "7.3.*",
-        "symfony/yaml": "7.3.*",
-        "ext-bcmath": "*"
+        "symfony/yaml": "7.3.*"
     },
     "config": {
         "allow-plugins": {
