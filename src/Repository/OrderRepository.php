@@ -24,6 +24,12 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
+    /**
+     * Find all order query
+     *
+     * @param OrderFilterInput|null $filters
+     * @return Query
+     */
     public function findFilteredQuery(?OrderFilterInput $filters = null): Query
     {
         $qb = $this->createQueryBuilder('o');
@@ -37,6 +43,13 @@ class OrderRepository extends ServiceEntityRepository
         return $qb->getQuery();
     }
 
+    /**
+     * Save an order entity
+     *
+     * @param Order $order
+     * @param bool $flush
+     * @return void
+     */
     public function save(Order $order, bool $flush = false): void
     {
         $this->em->persist($order);

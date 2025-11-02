@@ -27,6 +27,13 @@ readonly class OrderService
     {
     }
 
+    /**
+     * Find all orders with pagination
+     *
+     * @param PaginationOptions $pagination
+     * @param OrderFilterInput|null $filters
+     * @return PaginatedList
+     */
     public function findAllPaginated(PaginationOptions $pagination, ?OrderFilterInput $filters = null): PaginatedList
     {
         $pagination = $this->paginator->paginate(
@@ -43,6 +50,13 @@ readonly class OrderService
         return new PaginatedList($pagination);
     }
 
+    /**
+     * Create a new order
+     *
+     * @param OrderCreateInput $input
+     * @return OrderOutput
+     * @throws UnprocessableEntityHttpException
+     */
     public function create(OrderCreateInput $input): OrderOutput
     {
         $customer = $this->customerRepository->find($input->customerId);
@@ -81,6 +95,13 @@ readonly class OrderService
         return new OrderOutput($order);
     }
 
+    /**
+     * Update the status of an order
+     *
+     * @param Order $order
+     * @param OrderStatus $status
+     * @return OrderOutput
+     */
     public function updateStatus(Order $order, OrderStatus $status): OrderOutput
     {
         $order->setStatus($status);
