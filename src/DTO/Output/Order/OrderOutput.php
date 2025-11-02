@@ -11,13 +11,12 @@ class OrderOutput
     public int $id;
     public int $customerId;
     public string $totalAmount;
-
-    /** @var OrderProductOutput[] */
-    public array $products;
-
     public OrderStatus $status;
     public \DateTimeInterface $createdAt;
     public \DateTimeInterface $updatedAt;
+
+    /** @var OrderProductOutput[] */
+    public array $products;
 
     public function __construct(Order $order)
     {

@@ -80,4 +80,13 @@ readonly class OrderService
 
         return new OrderOutput($order);
     }
+
+    public function updateStatus(Order $order, OrderStatus $status): OrderOutput
+    {
+        $order->setStatus($status);
+
+        $this->orderRepository->save($order);
+
+        return new OrderOutput($order);
+    }
 }
