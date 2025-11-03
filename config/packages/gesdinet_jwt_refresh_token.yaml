@@ -1,0 +1,10 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\Entity\RefreshToken
+    single_use: true
+    return_expiration: true
+    cookie:
+        enabled: true
+        http_only: true
+        secure: false # Set to true in production
+        same_site: 'lax'
+        remove_token_from_body: true
