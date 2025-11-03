@@ -13,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Table('customers')]
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[Gedmo\SoftDeleteable]
+#[Gedmo\Loggable()]
 class Customer
 {
     use TimestampableEntity, SoftDeleteableEntity;
@@ -22,12 +23,15 @@ class Customer
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $phone = null;
 

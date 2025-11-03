@@ -13,6 +13,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 #[ORM\Table(name: 'products')]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[Gedmo\SoftDeleteable]
+#[Gedmo\Loggable]
 class Product
 {
     use TimestampableEntity, SoftDeleteableEntity;
@@ -22,12 +23,15 @@ class Product
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(length: 128)]
     private ?string $name = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $price = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: Types::STRING, length: 32, enumType: ProductCategory::class)]
     private ?ProductCategory $category = null;
 

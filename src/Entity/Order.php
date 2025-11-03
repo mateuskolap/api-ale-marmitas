@@ -15,6 +15,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 #[ORM\Table('orders')]
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[Gedmo\SoftDeleteable]
+#[Gedmo\Loggable]
 class Order
 {
     use TimestampableEntity, SoftDeleteableEntity;
@@ -31,6 +32,7 @@ class Order
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $total = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: Types::STRING, length: 32, enumType: OrderStatus::class)]
     private ?OrderStatus $status = null;
 
