@@ -79,17 +79,9 @@ readonly class UserService
      */
     public function update(UserUpdateInput $input, User $user): UserOutput
     {
-        if ($input->email) {
-            $user->setEmail($input->email);
-        }
-
-        if ($input->roles) {
-            $user->setRoles($input->roles);
-        }
-
-        if ($input->password) {
-            $user->setPassword($this->hasher->hashPassword($user, $input->password));
-        }
+        $input->email && $user->setEmail($input->email);
+        $input->roles && $user->setRoles($input->roles);
+        $input->password && $user->setPassword($this->hasher->hashPassword($user, $input->password));
 
         $this->userRepository->save($user, true);
 
