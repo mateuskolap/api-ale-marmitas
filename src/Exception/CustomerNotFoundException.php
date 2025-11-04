@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Exception;
+
+use Psr\Log\LogLevel;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
+
+#[WithLogLevel(LogLevel::INFO)]
+#[WithHttpStatus(Response::HTTP_NOT_FOUND)]
+class CustomerNotFoundException extends \DomainException
+{
+    public function __construct(int $customerId)
+    {
+        parent::__construct("Customer with id {$customerId} not found.");
+    }
+}

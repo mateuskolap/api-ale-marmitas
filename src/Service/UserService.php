@@ -3,13 +3,13 @@
 namespace App\Service;
 
 use App\DTO\Input\PaginationOptions;
-use App\DTO\Input\Product\ProductFilterInput;
 use App\DTO\Input\User\UserCreateInput;
 use App\DTO\Input\User\UserFilterInput;
 use App\DTO\Input\User\UserUpdateInput;
-use App\DTO\Output\PaginatedList;
+use App\DTO\Output\Pagination\PaginatedList;
 use App\DTO\Output\User\UserOutput;
 use App\Entity\User;
+use App\Exception\EmailAlreadyExistsException;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,7 +58,7 @@ readonly class UserService
     public function create(UserCreateInput $input): UserOutput
     {
         $this->userRepository->findOneBy(['email' => $input->email])
-            && throw new \InvalidArgumentException('User with this email already exists.', Response::HTTP_BAD_REQUEST);
+            && throw new EmailAlreadyExistsException($input->email);
 
         $user = (new User())
             ->setEmail($input->email)

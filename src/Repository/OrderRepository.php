@@ -17,7 +17,6 @@ class OrderRepository extends ServiceEntityRepository
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly CustomerRepository $customerRepository,
         ManagerRegistry                         $registry,
     )
     {
@@ -34,8 +33,7 @@ class OrderRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('o');
 
-        $filters->customerId && $qb->andWhere('o.customer = :customer')
-            ->setParameter('customer', $this->customerRepository->find($filters->customerId));
+        $filters->customerId && $qb->andWhere('o.customer = :customerId')->setParameter('customerId', $filters->customerId);
         $filters->status && $qb->andWhere('o.status = :status')->setParameter('status', $filters->status);
         $filters->createdFrom && $qb->andWhere('o.createdAt >= :createdFrom')->setParameter('createdFrom', $filters->createdFrom);
         $filters->createdTo && $qb->andWhere('o.createdAt <= :createdTo')->setParameter('createdTo', $filters->createdTo);

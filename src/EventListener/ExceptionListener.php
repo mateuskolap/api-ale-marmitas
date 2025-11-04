@@ -20,7 +20,6 @@ final class ExceptionListener
         }
 
         $responseData = [
-            'success' => false,
             'status' => $statusCode,
             'error' => [
                 'title' => get_class($exception),

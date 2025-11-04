@@ -7,7 +7,7 @@ use App\DTO\Input\Customer\CustomerFilterInput;
 use App\DTO\Input\Customer\CustomerUpdateInput;
 use App\DTO\Input\PaginationOptions;
 use App\DTO\Output\Customer\CustomerOutput;
-use App\DTO\Output\PaginatedList;
+use App\DTO\Output\Pagination\PaginatedList;
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
 use Knp\Component\Pager\PaginatorInterface;

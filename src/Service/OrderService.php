@@ -6,10 +6,12 @@ use App\DTO\Input\Order\OrderCreateInput;
 use App\DTO\Input\Order\OrderFilterInput;
 use App\DTO\Input\PaginationOptions;
 use App\DTO\Output\Order\OrderOutput;
-use App\DTO\Output\PaginatedList;
+use App\DTO\Output\Pagination\PaginatedList;
 use App\Entity\Order;
 use App\Entity\OrderProduct;
 use App\Enum\OrderStatus;
+use App\Exception\CustomerNotFoundException;
+use App\Exception\ProductNotFoundException;
 use App\Repository\CustomerRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
@@ -61,7 +63,7 @@ readonly class OrderService
     {
         $customer = $this->customerRepository->find($input->customerId);
         if (!$customer) {
-            throw new UnprocessableEntityHttpException("Customer with id {$input->customerId} not found.");
+            throw new CustomerNotFoundException($input->customerId);
         }
 
         $order = new Order();
@@ -71,7 +73,7 @@ readonly class OrderService
         foreach ($input->products as $orderProductDTO) {
             $product = $this->productRepository->find($orderProductDTO->productId);
             if (!$product) {
-                throw new UnprocessableEntityHttpException("Product with id {$orderProductDTO->productId} not found.");
+                throw new ProductNotFoundException($orderProductDTO->productId);
             }
 
             $subTotal = bcmul($product->getPrice(), (string)$orderProductDTO->quantity, 2);

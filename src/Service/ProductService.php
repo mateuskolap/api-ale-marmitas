@@ -6,7 +6,7 @@ use App\DTO\Input\PaginationOptions;
 use App\DTO\Input\Product\ProductCreateInput;
 use App\DTO\Input\Product\ProductFilterInput;
 use App\DTO\Input\Product\ProductUpdateInput;
-use App\DTO\Output\PaginatedList;
+use App\DTO\Output\Pagination\PaginatedList;
 use App\DTO\Output\Product\ProductOutput;
 use App\Entity\Product;
 use App\Enum\ProductCategory;
