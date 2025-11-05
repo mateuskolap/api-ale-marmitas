@@ -17,6 +17,7 @@ use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class OrderService
 {
@@ -25,6 +26,7 @@ readonly class OrderService
         private CustomerRepository $customerRepository,
         private ProductRepository  $productRepository,
         private PaginatorInterface $paginator,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -45,7 +47,7 @@ readonly class OrderService
         );
 
         $pagination->setItems(array_map(
-            fn(Order $order) => new OrderOutput($order),
+            fn(Order $order) => $this->mapper->map($order, OrderOutput::class),
             $pagination->getItems()
         ));
 
@@ -94,7 +96,7 @@ readonly class OrderService
 
         $this->orderRepository->save($order, true);
 
-        return new OrderOutput($order);
+        return $this->mapper->map($order, OrderOutput::class);
     }
 
     /**
@@ -110,6 +112,6 @@ readonly class OrderService
 
         $this->orderRepository->save($order);
 
-        return new OrderOutput($order);
+        return $this->mapper->map($order, OrderOutput::class);
     }
 }

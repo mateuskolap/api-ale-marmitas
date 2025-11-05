@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -24,6 +25,7 @@ final class ProductController extends AbstractController
 {
     public function __construct(
         private readonly ProductService $productService,
+        private readonly ObjectMapperInterface $mapper,
     )
     {
     }
@@ -40,7 +42,7 @@ final class ProductController extends AbstractController
     #[Route('/{product}', name: 'show', methods: ['GET'])]
     public function show(Product $product): JsonResponse
     {
-        return $this->json(new ProductOutput($product));
+        return $this->json($this->mapper->map($product, ProductOutput::class));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

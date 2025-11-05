@@ -11,12 +11,14 @@ use App\DTO\Output\Pagination\PaginatedList;
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class CustomerService
 {
     public function __construct(
         private PaginatorInterface $paginator,
-        private CustomerRepository $customerRepository
+        private CustomerRepository $customerRepository,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -37,7 +39,7 @@ readonly class CustomerService
         );
 
         $pagination->setItems(array_map(
-            fn(Customer $customer) => new CustomerOutput($customer),
+            fn(Customer $customer) => $this->mapper->map($customer, CustomerOutput::class),
             $pagination->getItems()
         ));
 
@@ -59,7 +61,7 @@ readonly class CustomerService
 
         $this->customerRepository->save($customer, true);
 
-        return new CustomerOutput($customer);
+        return $this->mapper->map($customer, CustomerOutput::class);
     }
 
     /**
@@ -77,7 +79,7 @@ readonly class CustomerService
 
         $this->customerRepository->save($customer, true);
 
-        return new CustomerOutput($customer);
+        return $this->mapper->map($customer, CustomerOutput::class);
     }
 
     /**

@@ -12,12 +12,14 @@ use App\Entity\Product;
 use App\Enum\ProductCategory;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class ProductService
 {
     public function __construct(
         private ProductRepository  $productRepository,
         private PaginatorInterface $paginator,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -38,7 +40,7 @@ readonly class ProductService
         );
 
         $pagination->setItems(array_map(
-            fn(Product $product) => new ProductOutput($product),
+            fn(Product $product) => $this->mapper->map($product, ProductOutput::class),
             $pagination->getItems()
         ));
 
@@ -60,7 +62,7 @@ readonly class ProductService
 
         $this->productRepository->save($product, true);
 
-        return new ProductOutput($product);
+        return $this->mapper->map($product, ProductOutput::class);
     }
 
     /**
@@ -78,7 +80,7 @@ readonly class ProductService
 
         $this->productRepository->save($product, true);
 
-        return new ProductOutput($product);
+        return $this->mapper->map($product, ProductOutput::class);
     }
 
     /**

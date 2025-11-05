@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -24,6 +25,7 @@ final class UserController extends AbstractController
 {
     public function __construct(
         private readonly UserService $userService,
+        private readonly ObjectMapperInterface $mapper,
     )
     {
     }
@@ -40,7 +42,7 @@ final class UserController extends AbstractController
     #[Route('/{user}', name: 'show', methods: ['GET'])]
     public function show(User $user): JsonResponse
     {
-        return $this->json(new UserOutput($user));
+        return $this->json($this->mapper->map($user, UserOutput::class));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

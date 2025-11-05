@@ -12,7 +12,7 @@ use App\Entity\User;
 use App\Exception\EmailAlreadyExistsException;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 readonly class UserService
@@ -21,7 +21,7 @@ readonly class UserService
         private UserRepository              $userRepository,
         private PaginatorInterface          $paginator,
         private UserPasswordHasherInterface $hasher,
-
+        private ObjectMapperInterface       $mapper,
     )
     {
     }
@@ -42,7 +42,7 @@ readonly class UserService
         );
 
         $pagination->setItems(array_map(
-            fn(User $user) => new UserOutput($user),
+            fn(User $user) => $this->mapper->map($user, UserOutput::class),
             $pagination->getItems()
         ));
 
@@ -67,7 +67,7 @@ readonly class UserService
 
         $this->userRepository->save($user, true);
 
-        return new UserOutput($user);
+        return $this->mapper->map($user, UserOutput::class);
     }
 
     /**
@@ -85,7 +85,7 @@ readonly class UserService
 
         $this->userRepository->save($user, true);
 
-        return new UserOutput($user);
+        return $this->mapper->map($user, UserOutput::class);
     }
 
     /**
