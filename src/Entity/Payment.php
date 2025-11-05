@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\PaymentMethod;
 use App\Repository\PaymentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -34,8 +35,8 @@ class Payment
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date = null;
 
-    #[ORM\Column(length: 32)]
-    private ?string $method = null;
+    #[ORM\Column(type: Types::STRING, length: 32, enumType: PaymentMethod::class)]
+    private ?PaymentMethod $method = null;
 
     #[ORM\Column(length: 255)]
     private ?string $notes = null;
@@ -92,12 +93,12 @@ class Payment
         return $this;
     }
 
-    public function getMethod(): ?string
+    public function getMethod(): ?PaymentMethod
     {
         return $this->method;
     }
 
-    public function setMethod(string $method): static
+    public function setMethod(PaymentMethod $method): static
     {
         $this->method = $method;
 
