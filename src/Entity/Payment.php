@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use App\Enum\OrderStatus;
-use App\Repository\OrderRepository;
+use App\Repository\PaymentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -12,11 +11,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
-#[ORM\Table('orders')]
-#[ORM\Entity(repositoryClass: OrderRepository::class)]
+#[ORM\Table(name: 'payments')]
+#[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[Gedmo\SoftDeleteable]
 #[Gedmo\Loggable]
-class Order
+class Payment
 {
     use TimestampableEntity, SoftDeleteableEntity;
 
@@ -25,32 +24,30 @@ class Order
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\ManyToOne(inversedBy: 'payments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Customer $customer = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $total = null;
+    private ?string $amount = null;
 
-    #[Gedmo\Versioned]
-    #[ORM\Column(type: Types::STRING, length: 32, enumType: OrderStatus::class)]
-    private ?OrderStatus $status = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $date = null;
 
-    /**
-     * @var Collection<int, OrderProduct>
-     */
-    #[ORM\OneToMany(targetEntity: OrderProduct::class, mappedBy: 'order', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $orderProducts;
+    #[ORM\Column(length: 32)]
+    private ?string $method = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $notes = null;
 
     /**
      * @var Collection<int, OrderPayment>
      */
-    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'orderRef')]
+    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'payment')]
     private Collection $orderPayments;
 
     public function __construct()
     {
-        $this->orderProducts = new ArrayCollection();
         $this->orderPayments = new ArrayCollection();
     }
 
@@ -71,55 +68,50 @@ class Order
         return $this;
     }
 
-    public function getTotal(): ?string
+    public function getAmount(): ?string
     {
-        return $this->total;
+        return $this->amount;
     }
 
-    public function setTotal(string $total): static
+    public function setAmount(string $amount): static
     {
-        $this->total = $total;
+        $this->amount = $amount;
 
         return $this;
     }
 
-    public function getStatus(): ?OrderStatus
+    public function getDate(): ?\DateTime
     {
-        return $this->status;
+        return $this->date;
     }
 
-    public function setStatus(OrderStatus $status): static
+    public function setDate(\DateTime $date): static
     {
-        $this->status = $status;
+        $this->date = $date;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, OrderProduct>
-     */
-    public function getOrderProducts(): Collection
+    public function getMethod(): ?string
     {
-        return $this->orderProducts;
+        return $this->method;
     }
 
-    public function addOrderProduct(OrderProduct $orderProduct): static
+    public function setMethod(string $method): static
     {
-        if (!$this->orderProducts->contains($orderProduct)) {
-            $this->orderProducts->add($orderProduct);
-            $orderProduct->setOrder($this);
-        }
+        $this->method = $method;
 
         return $this;
     }
 
-    public function removeOrderProduct(OrderProduct $orderProduct): static
+    public function getNotes(): ?string
     {
-        if ($this->orderProducts->removeElement($orderProduct)) {
-            if ($orderProduct->getOrder() === $this) {
-                $orderProduct->setOrder(null);
-            }
-        }
+        return $this->notes;
+    }
+
+    public function setNotes(string $notes): static
+    {
+        $this->notes = $notes;
 
         return $this;
     }
@@ -136,7 +128,7 @@ class Order
     {
         if (!$this->orderPayments->contains($orderPayment)) {
             $this->orderPayments->add($orderPayment);
-            $orderPayment->setOrderRef($this);
+            $orderPayment->setPayment($this);
         }
 
         return $this;
@@ -146,8 +138,8 @@ class Order
     {
         if ($this->orderPayments->removeElement($orderPayment)) {
             // set the owning side to null (unless already changed)
-            if ($orderPayment->getOrderRef() === $this) {
-                $orderPayment->setOrderRef(null);
+            if ($orderPayment->getPayment() === $this) {
+                $orderPayment->setPayment(null);
             }
         }
 
