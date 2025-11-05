@@ -16,8 +16,6 @@ use App\Repository\CustomerRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class OrderService
 {
@@ -26,7 +24,6 @@ readonly class OrderService
         private CustomerRepository $customerRepository,
         private ProductRepository  $productRepository,
         private PaginatorInterface $paginator,
-        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -47,7 +44,7 @@ readonly class OrderService
         );
 
         $pagination->setItems(array_map(
-            fn(Order $order) => $this->mapper->map($order, OrderOutput::class),
+            fn(Order $order) => new OrderOutput($order),
             $pagination->getItems()
         ));
 
@@ -59,7 +56,6 @@ readonly class OrderService
      *
      * @param OrderCreateInput $input
      * @return OrderOutput
-     * @throws UnprocessableEntityHttpException
      */
     public function create(OrderCreateInput $input): OrderOutput
     {
@@ -78,13 +74,13 @@ readonly class OrderService
                 throw new ProductNotFoundException($orderProductDTO->productId);
             }
 
-            $subTotal = bcmul($product->getPrice(), (string)$orderProductDTO->quantity, 2);
-            $totalOrder = bcadd($totalOrder, $subTotal, 2);
+            $subtotal = bcmul($product->getPrice(), (string)$orderProductDTO->quantity, 2);
+            $totalOrder = bcadd($totalOrder, $subtotal, 2);
 
             $orderProduct = (new OrderProduct())
                 ->setProduct($product)
                 ->setQuantity($orderProductDTO->quantity)
-                ->setSubtotal($subTotal);
+                ->setSubtotal($subtotal);
 
             $order->addOrderProduct($orderProduct);
         }
@@ -96,7 +92,7 @@ readonly class OrderService
 
         $this->orderRepository->save($order, true);
 
-        return $this->mapper->map($order, OrderOutput::class);
+        return new OrderOutput($order);
     }
 
     /**
@@ -112,6 +108,6 @@ readonly class OrderService
 
         $this->orderRepository->save($order);
 
-        return $this->mapper->map($order, OrderOutput::class);
+        return new OrderOutput($order);
     }
 }
