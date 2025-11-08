@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
-use App\DTO\Input\Order\OrderCreateInput;
-use App\DTO\Input\Order\OrderFilterInput;
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Output\Order\OrderOutput;
-use App\DTO\Output\Pagination\PaginatedList;
+use App\Dto\Input\Order\OrderCreateInput;
+use App\Dto\Input\Order\OrderFilterInput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Output\Order\OrderOutput;
+use App\Dto\Output\Pagination\PaginatedList;
 use App\Entity\Order;
 use App\Entity\OrderProduct;
 use App\Enum\OrderStatus;
@@ -16,14 +16,16 @@ use App\Repository\CustomerRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class OrderService
 {
     public function __construct(
-        private OrderRepository    $orderRepository,
-        private CustomerRepository $customerRepository,
-        private ProductRepository  $productRepository,
-        private PaginatorInterface $paginator,
+        private OrderRepository       $orderRepository,
+        private CustomerRepository    $customerRepository,
+        private ProductRepository     $productRepository,
+        private PaginatorInterface    $paginator,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -44,7 +46,7 @@ readonly class OrderService
         );
 
         $pagination->setItems(array_map(
-            fn(Order $order) => new OrderOutput($order),
+            fn(Order $order) => $this->mapper->map($order, OrderOutput::class),
             $pagination->getItems()
         ));
 
@@ -92,7 +94,7 @@ readonly class OrderService
 
         $this->orderRepository->save($order, true);
 
-        return new OrderOutput($order);
+        return $this->mapper->map($order, OrderOutput::class);
     }
 
     /**
@@ -108,6 +110,6 @@ readonly class OrderService
 
         $this->orderRepository->save($order);
 
-        return new OrderOutput($order);
+        return $this->mapper->map($order, OrderOutput::class);
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Input\Product\ProductCreateInput;
-use App\DTO\Input\Product\ProductFilterInput;
-use App\DTO\Input\Product\ProductUpdateInput;
-use App\DTO\Output\Pagination\PaginatedList;
-use App\DTO\Output\Product\ProductOutput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\Product\ProductCreateInput;
+use App\Dto\Input\Product\ProductFilterInput;
+use App\Dto\Input\Product\ProductUpdateInput;
+use App\Dto\Output\Pagination\PaginatedList;
+use App\Dto\Output\Product\ProductOutput;
 use App\Entity\Product;
 use App\Enum\ProductCategory;
 use App\Repository\ProductRepository;

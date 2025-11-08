@@ -2,11 +2,11 @@
 
 namespace App\Controller\Api\v1;
 
-use App\DTO\Input\Order\OrderCreateInput;
-use App\DTO\Input\Order\OrderFilterInput;
-use App\DTO\Input\Order\OrderStatusUpdateInput;
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Output\Order\OrderOutput;
+use App\Dto\Input\Order\OrderCreateInput;
+use App\Dto\Input\Order\OrderFilterInput;
+use App\Dto\Input\Order\OrderStatusUpdateInput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Output\Order\OrderOutput;
 use App\Entity\Order;
 use App\Enum\OrderStatus;
 use App\Enum\Role;

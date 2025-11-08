@@ -2,11 +2,11 @@
 
 namespace App\Controller\Api\v1;
 
-use App\DTO\Input\Customer\CustomerCreateInput;
-use App\DTO\Input\Customer\CustomerFilterInput;
-use App\DTO\Input\Customer\CustomerUpdateInput;
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Output\Customer\CustomerOutput;
+use App\Dto\Input\Customer\CustomerCreateInput;
+use App\Dto\Input\Customer\CustomerFilterInput;
+use App\Dto\Input\Customer\CustomerUpdateInput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Output\Customer\CustomerOutput;
 use App\Entity\Customer;
 use App\Enum\Role;
 use App\Service\CustomerService;
