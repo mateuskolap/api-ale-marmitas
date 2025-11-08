@@ -2,10 +2,13 @@
 
 namespace App\Controller\Api\v1;
 
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\Payment\PaymentFilterInput;
 use App\Service\PaymentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/v1/payments', name: 'app_api_v1_payments_')]
@@ -18,9 +21,12 @@ final class PaymentController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(
+        #[MapQueryString] PaginationOptions $pagination,
+        #[MapQueryString] PaymentFilterInput $filters,
+    ): JsonResponse
     {
-        return $this->json([]);
+        return $this->json($this->paymentService->findAllPaginated($pagination, $filters));
     }
 
     #[Route('/{payment}', name: 'show', methods: ['GET'])]

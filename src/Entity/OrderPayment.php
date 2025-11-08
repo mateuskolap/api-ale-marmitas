@@ -11,7 +11,6 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 #[ORM\Table(name: 'order_payments')]
 #[ORM\Entity]
 #[Gedmo\SoftDeleteable]
-#[Gedmo\Loggable]
 class OrderPayment
 {
     use TimestampableEntity, SoftDeleteableEntity;

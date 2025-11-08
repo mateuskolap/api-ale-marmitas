@@ -32,12 +32,15 @@ class Payment
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: Types::STRING, length: 32, enumType: PaymentMethod::class)]
     private ?PaymentMethod $method = null;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(length: 255)]
     private ?string $notes = null;
 
