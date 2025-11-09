@@ -48,12 +48,12 @@ class OrderPayment
         return $this;
     }
 
-    public function getOrderRef(): ?Order
+    public function getOrder(): ?Order
     {
         return $this->order;
     }
 
-    public function setOrderRef(?Order $order): static
+    public function setOrder(?Order $order): static
     {
         $this->order = $order;
 

@@ -3,10 +3,17 @@
 namespace App\Service;
 
 use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
 use App\Dto\Output\Pagination\PaginatedList;
 use App\Dto\Output\Payment\PaymentOutput;
+use App\Entity\OrderPayment;
 use App\Entity\Payment;
+use App\Enum\PaymentMethod;
+use App\Exception\CustomerNotFoundException;
+use App\Exception\NoOrdersToAllocatePaymentException;
+use App\Repository\CustomerRepository;
+use App\Repository\OrderRepository;
 use App\Repository\PaymentRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -16,7 +23,10 @@ readonly class PaymentService
     public function __construct(
         private PaginatorInterface    $paginator,
         private PaymentRepository     $paymentRepository,
-        private ObjectMapperInterface $mapper
+        private CustomerRepository    $customerRepository,
+        private OrderRepository       $orderRepository,
+        private ObjectMapperInterface $mapper,
+
     )
     {
     }
@@ -30,17 +40,74 @@ readonly class PaymentService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?PaymentFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResults = $this->paginator->paginate(
             $this->paymentRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
+        $paginatedResults->setItems(array_map(
             fn(Payment $payment) => $this->mapper->map($payment, PaymentOutput::class),
-            $pagination->getItems()
+            $paginatedResults->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResults);
+    }
+
+    public function create(PaymentCreateInput $input): PaymentOutput
+    {
+        $customer = $this->customerRepository->find($input->customerId);
+        if (!$customer) {
+            throw new CustomerNotFoundException($input->customerId);
+        }
+
+        $payment = (new Payment())
+            ->setCustomer($customer)
+            ->setAmount($input->amount)
+            ->setDate($input->date)
+            ->setMethod(PaymentMethod::from($input->method))
+            ->setNotes($input->notes);
+
+        $this->allocatePaymentToOrders($payment);
+
+        if ($payment->getOrderPayments()->isEmpty()) {
+            throw new NoOrdersToAllocatePaymentException();
+        }
+
+        $changeGiven = bcsub($payment->getAmount(), $payment->getAmountApplied(), 2);
+        $payment->setChangeGiven(bccomp($changeGiven, '0.00', 2) > 0 ? $changeGiven : '0.00');
+
+        $this->paymentRepository->save($payment, true);
+
+        return $this->mapper->map($payment, PaymentOutput::class);
+    }
+
+    private function allocatePaymentToOrders(Payment $payment): void
+    {
+        $customer = $payment->getCustomer();
+        $toAllocate = $payment->getAmount();
+        $incompleteOrders = $this->orderRepository->findWithIncompletePaymentByCustomer($customer);
+
+        foreach ($incompleteOrders as $order) {
+            if (bccomp($toAllocate, '0.00', 2) <= 0) {
+                break;
+            }
+
+            $remainingAmount = bcsub($order->getTotal(), $order->getTotalPaid(), 2);
+            if (bccomp($remainingAmount, '0.00', 2) <= 0) {
+                continue;
+            }
+
+            $amountApplied = bccomp($remainingAmount, $toAllocate, 2) <= 0 ? $remainingAmount : $toAllocate;
+
+            $payment->addOrderPayment(
+                (new OrderPayment())
+                    ->setOrder($order)
+                    ->setPayment($payment)
+                    ->setAmountApplied($amountApplied)
+            );
+
+            $toAllocate = bcsub($toAllocate, $amountApplied, 2);
+        }
     }
 }

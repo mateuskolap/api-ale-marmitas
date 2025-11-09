@@ -13,7 +13,8 @@ class PaymentOutput
     public int $id;
     #[Map(source: 'customer.id')]
     public int $customerId;
-    public string $amount;
+    public float $amount;
+    public float $changeGiven;
     public \DateTimeInterface $date;
     public PaymentMethod $method;
     public ?string $notes;

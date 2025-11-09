@@ -33,18 +33,18 @@ readonly class ProductService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?ProductFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResults = $this->paginator->paginate(
             $this->productRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
+        $paginatedResults->setItems(array_map(
             fn(Product $product) => $this->mapper->map($product, ProductOutput::class),
-            $pagination->getItems()
+            $paginatedResults->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResults);
     }
 
     /**

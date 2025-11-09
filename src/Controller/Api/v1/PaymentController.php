@@ -3,26 +3,32 @@
 namespace App\Controller\Api\v1;
 
 use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
+use App\Dto\Output\Payment\PaymentOutput;
+use App\Entity\Payment;
 use App\Service\PaymentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/v1/payments', name: 'app_api_v1_payments_')]
 final class PaymentController extends AbstractController
 {
     public function __construct(
-        private readonly PaymentService $paymentService,
+        private readonly PaymentService        $paymentService,
+        private readonly ObjectMapperInterface $mapper,
     )
     {
     }
 
     #[Route(name: 'list', methods: ['GET'])]
     public function list(
-        #[MapQueryString] PaginationOptions $pagination,
+        #[MapQueryString] PaginationOptions  $pagination,
         #[MapQueryString] PaymentFilterInput $filters,
     ): JsonResponse
     {
@@ -30,15 +36,15 @@ final class PaymentController extends AbstractController
     }
 
     #[Route('/{payment}', name: 'show', methods: ['GET'])]
-    public function show(): JsonResponse
+    public function show(Payment $payment): JsonResponse
     {
-        return $this->json([]);
+        return $this->json($this->mapper->map($payment, PaymentOutput::class));
     }
 
     #[Route(name: 'create', methods: ['POST'])]
-    public function create(): JsonResponse
+    public function create(#[MapRequestPayload] PaymentCreateInput $input): JsonResponse
     {
-        return $this->json([], Response::HTTP_CREATED);
+        return $this->json($this->paymentService->create($input), Response::HTTP_CREATED);
     }
 
     #[Route('/{payment}', name: 'update', methods: ['PATCH'])]

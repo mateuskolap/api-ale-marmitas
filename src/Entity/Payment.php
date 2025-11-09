@@ -32,22 +32,25 @@ class Payment
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    private ?string $changeGiven = null;
+
     #[Gedmo\Versioned]
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $date = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $date = null;
 
     #[Gedmo\Versioned]
     #[ORM\Column(type: Types::STRING, length: 32, enumType: PaymentMethod::class)]
     private ?PaymentMethod $method = null;
 
     #[Gedmo\Versioned]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
     /**
      * @var Collection<int, OrderPayment>
      */
-    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'payment')]
+    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'payment', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $orderPayments;
 
     public function __construct()
@@ -84,12 +87,24 @@ class Payment
         return $this;
     }
 
-    public function getDate(): ?\DateTime
+    public function getChangeGiven(): ?string
+    {
+        return $this->changeGiven;
+    }
+
+    public function setChangeGiven(string $changeGiven): static
+    {
+        $this->changeGiven = $changeGiven;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): static
+    public function setDate(\DateTimeImmutable $date): static
     {
         $this->date = $date;
 
@@ -113,7 +128,7 @@ class Payment
         return $this->notes;
     }
 
-    public function setNotes(string $notes): static
+    public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
 
@@ -148,5 +163,13 @@ class Payment
         }
 
         return $this;
+    }
+
+    public function getAmountApplied(): string
+    {
+        return $this->getOrderPayments()->reduce(
+            fn(string $total, OrderPayment $p) => bcadd($total, $p->getAmountApplied(), 2),
+            '0.00'
+        );
     }
 }

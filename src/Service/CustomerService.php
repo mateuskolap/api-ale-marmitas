@@ -32,18 +32,18 @@ readonly class CustomerService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?CustomerFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResult = $this->paginator->paginate(
             $this->customerRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
+        $paginatedResult->setItems(array_map(
             fn(Customer $customer) => $this->mapper->map($customer, CustomerOutput::class),
-            $pagination->getItems()
+            $paginatedResult->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResult);
     }
 
     /**

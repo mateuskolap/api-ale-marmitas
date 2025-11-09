@@ -45,7 +45,7 @@ class Order
     /**
      * @var Collection<int, OrderPayment>
      */
-    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'orderRef')]
+    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'order')]
     private Collection $orderPayments;
 
     public function __construct()
@@ -132,11 +132,24 @@ class Order
         return $this->orderPayments;
     }
 
+    public function getTotalPaid(): string
+    {
+        return $this->getOrderPayments()->reduce(
+            fn(string $total, OrderPayment $p) => bcadd($total, $p->getAmountApplied(), 2),
+            '0.00'
+        );
+    }
+
+    public function getRemainingAmount(): string
+    {
+        return bcsub($this->getTotal(), $this->getTotalPaid(), 2);
+    }
+
     public function addOrderPayment(OrderPayment $orderPayment): static
     {
         if (!$this->orderPayments->contains($orderPayment)) {
             $this->orderPayments->add($orderPayment);
-            $orderPayment->setOrderRef($this);
+            $orderPayment->setOrder($this);
         }
 
         return $this;
@@ -146,8 +159,8 @@ class Order
     {
         if ($this->orderPayments->removeElement($orderPayment)) {
             // set the owning side to null (unless already changed)
-            if ($orderPayment->getOrderRef() === $this) {
-                $orderPayment->setOrderRef(null);
+            if ($orderPayment->getOrder() === $this) {
+                $orderPayment->setOrder(null);
             }
         }
 

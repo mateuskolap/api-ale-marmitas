@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -24,7 +25,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class OrderController extends AbstractController
 {
     public function __construct(
-        private readonly OrderService $orderService
+        private readonly OrderService          $orderService,
+        private readonly ObjectMapperInterface $mapper,
     )
     {
     }
@@ -32,7 +34,7 @@ final class OrderController extends AbstractController
     #[Route(name: 'list', methods: ['GET'])]
     public function list(
         #[MapQueryString] PaginationOptions $pagination,
-        #[MapQueryString] OrderFilterInput $filters,
+        #[MapQueryString] OrderFilterInput  $filters,
     ): JsonResponse
     {
         return $this->json($this->orderService->findAllPaginated($pagination, $filters));
@@ -41,7 +43,7 @@ final class OrderController extends AbstractController
     #[Route('/{order}', name: 'show', methods: ['GET'])]
     public function show(Order $order): JsonResponse
     {
-        return $this->json(new OrderOutput($order));
+        return $this->json($this->mapper->map($order, OrderOutput::class));
     }
 
     #[Route(name: 'create', methods: ['POST'])]
@@ -51,7 +53,7 @@ final class OrderController extends AbstractController
     }
 
     #[Route('/{order}/status', name: 'update_status', methods: ['PATCH'])]
-    public function updateStatus(Order $order, #[MapQueryString] OrderStatusUpdateInput $input): JsonResponse
+    public function updateStatus(Order $order, #[MapRequestPayload] OrderStatusUpdateInput $input): JsonResponse
     {
         return $this->json($this->orderService->updateStatus($order, OrderStatus::from($input->status)));
     }

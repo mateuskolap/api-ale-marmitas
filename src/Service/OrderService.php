@@ -39,18 +39,18 @@ readonly class OrderService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?OrderFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResults = $this->paginator->paginate(
             $this->orderRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
+        $paginatedResults->setItems(array_map(
             fn(Order $order) => $this->mapper->map($order, OrderOutput::class),
-            $pagination->getItems()
+            $paginatedResults->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResults);
     }
 
     /**
@@ -68,24 +68,7 @@ readonly class OrderService
 
         $order = new Order();
 
-        $totalOrder = '0.00';
-
-        foreach ($input->products as $orderProductDTO) {
-            $product = $this->productRepository->find($orderProductDTO->productId);
-            if (!$product) {
-                throw new ProductNotFoundException($orderProductDTO->productId);
-            }
-
-            $subtotal = bcmul($product->getPrice(), (string)$orderProductDTO->quantity, 2);
-            $totalOrder = bcadd($totalOrder, $subtotal, 2);
-
-            $orderProduct = (new OrderProduct())
-                ->setProduct($product)
-                ->setQuantity($orderProductDTO->quantity)
-                ->setSubtotal($subtotal);
-
-            $order->addOrderProduct($orderProduct);
-        }
+        $totalOrder = $this->allocateProductsToOrder($order, $input->products);
 
         $order
             ->setCustomer($customer)
@@ -111,5 +94,29 @@ readonly class OrderService
         $this->orderRepository->save($order);
 
         return $this->mapper->map($order, OrderOutput::class);
+    }
+
+    private function allocateProductsToOrder(Order $order, array $products): string
+    {
+        $totalOrder = '0.00';
+
+        foreach ($products as $orderProductDto) {
+            $product = $this->productRepository->find($orderProductDto->productId);
+            if (!$product) {
+                throw new ProductNotFoundException($orderProductDto->productId);
+            }
+
+            $subtotal = bcmul($product->getPrice(), (string)$orderProductDto->quantity, 2);
+            $totalOrder = bcadd($totalOrder, $subtotal, 2);
+
+            $orderProduct = (new OrderProduct())
+                ->setProduct($product)
+                ->setQuantity($orderProductDto->quantity)
+                ->setSubtotal($subtotal);
+
+            $order->addOrderProduct($orderProduct);
+        }
+
+        return $totalOrder;
     }
 }
