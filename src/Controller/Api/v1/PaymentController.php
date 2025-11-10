@@ -5,8 +5,10 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
+use App\Dto\Input\Payment\PaymentUpdateInput;
 use App\Dto\Output\Payment\PaymentOutput;
 use App\Entity\Payment;
+use App\Enum\Role;
 use App\Service\PaymentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +17,9 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(Role::MANAGER->value)]
 #[Route('/api/v1/payments', name: 'app_api_v1_payments_')]
 final class PaymentController extends AbstractController
 {
@@ -48,14 +52,16 @@ final class PaymentController extends AbstractController
     }
 
     #[Route('/{payment}', name: 'update', methods: ['PATCH'])]
-    public function update(): JsonResponse
+    public function update(#[MapRequestPayload] PaymentUpdateInput $input, Payment $payment): JsonResponse
     {
-        return $this->json([]);
+        return $this->json($this->paymentService->update($input, $payment));
     }
 
     #[Route('/{payment}', name: 'delete', methods: ['DELETE'])]
-    public function delete(): JsonResponse
+    public function delete(Payment $payment): JsonResponse
     {
+        $this->paymentService->delete($payment);
+
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 }

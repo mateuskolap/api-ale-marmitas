@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
+use App\Dto\Input\Payment\PaymentUpdateInput;
 use App\Dto\Output\Pagination\PaginatedList;
 use App\Dto\Output\Payment\PaymentOutput;
 use App\Entity\OrderPayment;
@@ -54,6 +55,14 @@ readonly class PaymentService
         return new PaginatedList($paginatedResults);
     }
 
+    /**
+     * Create a new payment.
+     *
+     * @param PaymentCreateInput $input
+     * @return PaymentOutput
+     * @throws CustomerNotFoundException
+     * @throws NoOrdersToAllocatePaymentException
+     */
     public function create(PaymentCreateInput $input): PaymentOutput
     {
         $customer = $this->customerRepository->find($input->customerId);
@@ -82,6 +91,41 @@ readonly class PaymentService
         return $this->mapper->map($payment, PaymentOutput::class);
     }
 
+    /**
+     * Update an existing payment.
+     *
+     * @param PaymentUpdateInput $input
+     * @param Payment $payment
+     * @return PaymentOutput
+     */
+    public function update(PaymentUpdateInput $input, Payment $payment): PaymentOutput
+    {
+        $input->date && $payment->setDate($input->date);
+        $input->method && $payment->setMethod(PaymentMethod::from($input->method));
+        $input->notes && $payment->setNotes($input->notes);
+
+        $this->paymentRepository->save($payment, true);
+
+        return $this->mapper->map($payment, PaymentOutput::class);
+    }
+
+    /**
+     * Delete a payment.
+     *
+     * @param Payment $payment
+     * @return void
+     */
+    public function delete(Payment $payment): void
+    {
+        $this->paymentRepository->remove($payment, true);
+    }
+
+    /**
+     * Allocate payment amount to customer's incomplete orders.
+     *
+     * @param Payment $payment
+     * @return void
+     */
     private function allocatePaymentToOrders(Payment $payment): void
     {
         $customer = $payment->getCustomer();
