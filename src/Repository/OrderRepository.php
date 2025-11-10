@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Dto\Input\Order\OrderFilterInput;
 use App\Entity\Customer;
 use App\Entity\Order;
-use App\Repository\CustomerRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;

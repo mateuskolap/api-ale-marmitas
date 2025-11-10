@@ -13,6 +13,6 @@ class EmailAlreadyExistsException extends \DomainException
 {
     public function __construct(string $email)
     {
-        parent::__construct("Customer with email {$email} already exists.");
+        parent::__construct("User with email {$email} already exists.");
     }
 }

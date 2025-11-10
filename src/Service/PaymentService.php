@@ -72,7 +72,7 @@ readonly class PaymentService
 
         $payment = (new Payment())
             ->setCustomer($customer)
-            ->setAmount($input->amount)
+            ->setAmount((string)$input->amount)
             ->setDate($input->date)
             ->setMethod(PaymentMethod::from($input->method))
             ->setNotes($input->notes);
