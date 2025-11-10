@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\DTO\Input\Product\ProductFilterInput;
+use App\Dto\Input\Product\ProductFilterInput;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;

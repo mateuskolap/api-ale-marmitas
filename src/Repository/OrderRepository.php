@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
-use App\DTO\Input\Order\OrderFilterInput;
+use App\Dto\Input\Order\OrderFilterInput;
+use App\Entity\Customer;
 use App\Entity\Order;
-use App\Repository\CustomerRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
@@ -17,7 +17,6 @@ class OrderRepository extends ServiceEntityRepository
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly CustomerRepository $customerRepository,
         ManagerRegistry                         $registry,
     )
     {
@@ -34,8 +33,7 @@ class OrderRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('o');
 
-        $filters->customerId && $qb->andWhere('o.customer = :customer')
-            ->setParameter('customer', $this->customerRepository->find($filters->customerId));
+        $filters->customerId && $qb->andWhere('o.customer = :customerId')->setParameter('customerId', $filters->customerId);
         $filters->status && $qb->andWhere('o.status = :status')->setParameter('status', $filters->status);
         $filters->createdFrom && $qb->andWhere('o.createdAt >= :createdFrom')->setParameter('createdFrom', $filters->createdFrom);
         $filters->createdTo && $qb->andWhere('o.createdAt <= :createdTo')->setParameter('createdTo', $filters->createdTo);
@@ -57,5 +55,25 @@ class OrderRepository extends ServiceEntityRepository
         if ($flush) {
             $this->em->flush();
         }
+    }
+
+    /**
+     * Find orders with incomplete payment by the customer
+     *
+     * @param Customer $customer
+     * @return Order[]
+     */
+    public function findWithIncompletePaymentByCustomer(Customer $customer): array
+    {
+        $qb =  $this->createQueryBuilder('o')
+            ->andWhere('o.customer = :customer')
+            ->leftJoin('o.orderPayments', 'p')
+            ->addSelect('SUM(p.amountApplied) AS HIDDEN totalPaid')
+            ->groupBy('o.id')
+            ->having('totalPaid < o.total OR totalPaid IS NULL')
+            ->setParameter('customer', $customer)
+            ->addOrderBy('o.createdAt');
+
+        return $qb->getQuery()->getResult();
     }
 }

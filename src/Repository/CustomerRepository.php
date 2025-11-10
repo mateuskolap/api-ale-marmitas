@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\DTO\Input\Customer\CustomerFilterInput;
+use App\Dto\Input\Customer\CustomerFilterInput;
 use App\Entity\Customer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;

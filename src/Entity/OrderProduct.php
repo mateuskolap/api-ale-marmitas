@@ -32,7 +32,7 @@ class OrderProduct
     private ?int $quantity = 1;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $subTotal = null;
+    private ?string $subtotal = null;
 
     public function getId(): ?int
     {
@@ -77,12 +77,12 @@ class OrderProduct
 
     public function getSubtotal(): ?string
     {
-        return $this->subTotal;
+        return $this->subtotal;
     }
 
-    public function setSubtotal(string $subTotal): static
+    public function setSubtotal(string $subtotal): static
     {
-        $this->subTotal = $subTotal;
+        $this->subtotal = $subtotal;
 
         return $this;
     }

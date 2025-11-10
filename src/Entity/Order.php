@@ -42,9 +42,16 @@ class Order
     #[ORM\OneToMany(targetEntity: OrderProduct::class, mappedBy: 'order', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $orderProducts;
 
+    /**
+     * @var Collection<int, OrderPayment>
+     */
+    #[ORM\OneToMany(targetEntity: OrderPayment::class, mappedBy: 'order')]
+    private Collection $orderPayments;
+
     public function __construct()
     {
         $this->orderProducts = new ArrayCollection();
+        $this->orderPayments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -111,6 +118,49 @@ class Order
         if ($this->orderProducts->removeElement($orderProduct)) {
             if ($orderProduct->getOrder() === $this) {
                 $orderProduct->setOrder(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderPayment>
+     */
+    public function getOrderPayments(): Collection
+    {
+        return $this->orderPayments;
+    }
+
+    public function getTotalPaid(): string
+    {
+        return $this->getOrderPayments()->reduce(
+            fn(string $total, OrderPayment $p) => bcadd($total, $p->getAmountApplied(), 2),
+            '0.00'
+        );
+    }
+
+    public function getRemainingAmount(): string
+    {
+        return bcsub($this->getTotal(), $this->getTotalPaid(), 2);
+    }
+
+    public function addOrderPayment(OrderPayment $orderPayment): static
+    {
+        if (!$this->orderPayments->contains($orderPayment)) {
+            $this->orderPayments->add($orderPayment);
+            $orderPayment->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderPayment(OrderPayment $orderPayment): static
+    {
+        if ($this->orderPayments->removeElement($orderPayment)) {
+            // set the owning side to null (unless already changed)
+            if ($orderPayment->getOrder() === $this) {
+                $orderPayment->setOrder(null);
             }
         }
 

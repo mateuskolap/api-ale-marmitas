@@ -2,11 +2,11 @@
 
 namespace App\Controller\Api\v1;
 
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Input\User\UserCreateInput;
-use App\DTO\Input\User\UserFilterInput;
-use App\DTO\Input\User\UserUpdateInput;
-use App\DTO\Output\User\UserOutput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\User\UserCreateInput;
+use App\Dto\Input\User\UserFilterInput;
+use App\Dto\Input\User\UserUpdateInput;
+use App\Dto\Output\User\UserOutput;
 use App\Entity\User;
 use App\Enum\Role;
 use App\Service\UserService;
@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -24,6 +25,7 @@ final class UserController extends AbstractController
 {
     public function __construct(
         private readonly UserService $userService,
+        private readonly ObjectMapperInterface $mapper,
     )
     {
     }
@@ -40,7 +42,7 @@ final class UserController extends AbstractController
     #[Route('/{user}', name: 'show', methods: ['GET'])]
     public function show(User $user): JsonResponse
     {
-        return $this->json(new UserOutput($user));
+        return $this->json($this->mapper->map($user, UserOutput::class));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

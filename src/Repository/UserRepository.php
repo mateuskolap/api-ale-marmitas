@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\DTO\Input\User\UserFilterInput;
+use App\Dto\Input\User\UserFilterInput;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;

@@ -2,21 +2,23 @@
 
 namespace App\Service;
 
-use App\DTO\Input\Customer\CustomerCreateInput;
-use App\DTO\Input\Customer\CustomerFilterInput;
-use App\DTO\Input\Customer\CustomerUpdateInput;
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Output\Customer\CustomerOutput;
-use App\DTO\Output\PaginatedList;
+use App\Dto\Input\Customer\CustomerCreateInput;
+use App\Dto\Input\Customer\CustomerFilterInput;
+use App\Dto\Input\Customer\CustomerUpdateInput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Output\Customer\CustomerOutput;
+use App\Dto\Output\Pagination\PaginatedList;
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class CustomerService
 {
     public function __construct(
         private PaginatorInterface $paginator,
-        private CustomerRepository $customerRepository
+        private CustomerRepository $customerRepository,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -30,18 +32,18 @@ readonly class CustomerService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?CustomerFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResult = $this->paginator->paginate(
             $this->customerRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
-            fn(Customer $customer) => new CustomerOutput($customer),
-            $pagination->getItems()
+        $paginatedResult->setItems(array_map(
+            fn(Customer $customer) => $this->mapper->map($customer, CustomerOutput::class),
+            $paginatedResult->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResult);
     }
 
     /**
@@ -59,7 +61,7 @@ readonly class CustomerService
 
         $this->customerRepository->save($customer, true);
 
-        return new CustomerOutput($customer);
+        return $this->mapper->map($customer, CustomerOutput::class);
     }
 
     /**
@@ -77,7 +79,7 @@ readonly class CustomerService
 
         $this->customerRepository->save($customer, true);
 
-        return new CustomerOutput($customer);
+        return $this->mapper->map($customer, CustomerOutput::class);
     }
 
     /**

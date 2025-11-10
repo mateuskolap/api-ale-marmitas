@@ -2,17 +2,17 @@
 
 namespace App\Service;
 
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Input\Product\ProductFilterInput;
-use App\DTO\Input\User\UserCreateInput;
-use App\DTO\Input\User\UserFilterInput;
-use App\DTO\Input\User\UserUpdateInput;
-use App\DTO\Output\PaginatedList;
-use App\DTO\Output\User\UserOutput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\User\UserCreateInput;
+use App\Dto\Input\User\UserFilterInput;
+use App\Dto\Input\User\UserUpdateInput;
+use App\Dto\Output\Pagination\PaginatedList;
+use App\Dto\Output\User\UserOutput;
 use App\Entity\User;
+use App\Exception\EmailAlreadyExistsException;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 readonly class UserService
@@ -21,7 +21,7 @@ readonly class UserService
         private UserRepository              $userRepository,
         private PaginatorInterface          $paginator,
         private UserPasswordHasherInterface $hasher,
-
+        private ObjectMapperInterface       $mapper,
     )
     {
     }
@@ -35,18 +35,18 @@ readonly class UserService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?UserFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResults = $this->paginator->paginate(
             $this->userRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
-            fn(User $user) => new UserOutput($user),
-            $pagination->getItems()
+        $paginatedResults->setItems(array_map(
+            fn(User $user) => $this->mapper->map($user, UserOutput::class),
+            $paginatedResults->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResults);
     }
 
     /**
@@ -58,7 +58,7 @@ readonly class UserService
     public function create(UserCreateInput $input): UserOutput
     {
         $this->userRepository->findOneBy(['email' => $input->email])
-            && throw new \InvalidArgumentException('User with this email already exists.', Response::HTTP_BAD_REQUEST);
+            && throw new EmailAlreadyExistsException($input->email);
 
         $user = (new User())
             ->setEmail($input->email)
@@ -67,7 +67,7 @@ readonly class UserService
 
         $this->userRepository->save($user, true);
 
-        return new UserOutput($user);
+        return $this->mapper->map($user, UserOutput::class);
     }
 
     /**
@@ -85,7 +85,7 @@ readonly class UserService
 
         $this->userRepository->save($user, true);
 
-        return new UserOutput($user);
+        return $this->mapper->map($user, UserOutput::class);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -12,24 +13,27 @@ final class ExceptionListener
     #[AsEventListener]
     public function onExceptionEvent(ExceptionEvent $event): void
     {
-        $exception = $event->getThrowable();
+        $e = $event->getThrowable();
 
-        $statusCode = 500;
-        if ($exception instanceof HttpExceptionInterface) {
-            $statusCode = $exception->getStatusCode();
-        }
+        $statusCode = $e instanceof HttpExceptionInterface
+            ? $e->getStatusCode()
+            : $this->getStatusFromAttribute($e) ?? 500;
 
-        $responseData = [
-            'success' => false,
+        $response = new JsonResponse([
             'status' => $statusCode,
             'error' => [
-                'title' => get_class($exception),
-                'message' => $exception->getMessage(),
+                'title' => $e::class,
+                'message' => $e->getMessage(),
                 'timestamp' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
-            ]
-        ];
+            ],
+        ], $statusCode);
 
-        $response = new JsonResponse($responseData, $statusCode);
         $event->setResponse($response);
+    }
+
+    private function getStatusFromAttribute(object $e): ?int
+    {
+        $attr = (new \ReflectionClass($e))->getAttributes(WithHttpStatus::class)[0] ?? null;
+        return $attr?->getArguments()[0] ?? null;
     }
 }

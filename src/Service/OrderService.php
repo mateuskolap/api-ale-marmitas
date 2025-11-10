@@ -2,27 +2,30 @@
 
 namespace App\Service;
 
-use App\DTO\Input\Order\OrderCreateInput;
-use App\DTO\Input\Order\OrderFilterInput;
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Output\Order\OrderOutput;
-use App\DTO\Output\PaginatedList;
+use App\Dto\Input\Order\OrderCreateInput;
+use App\Dto\Input\Order\OrderFilterInput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Output\Order\OrderOutput;
+use App\Dto\Output\Pagination\PaginatedList;
 use App\Entity\Order;
 use App\Entity\OrderProduct;
 use App\Enum\OrderStatus;
+use App\Exception\CustomerNotFoundException;
+use App\Exception\ProductNotFoundException;
 use App\Repository\CustomerRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class OrderService
 {
     public function __construct(
-        private OrderRepository    $orderRepository,
-        private CustomerRepository $customerRepository,
-        private ProductRepository  $productRepository,
-        private PaginatorInterface $paginator,
+        private OrderRepository       $orderRepository,
+        private CustomerRepository    $customerRepository,
+        private ProductRepository     $productRepository,
+        private PaginatorInterface    $paginator,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -36,18 +39,18 @@ readonly class OrderService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?OrderFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResults = $this->paginator->paginate(
             $this->orderRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
-            fn(Order $order) => new OrderOutput($order),
-            $pagination->getItems()
+        $paginatedResults->setItems(array_map(
+            fn(Order $order) => $this->mapper->map($order, OrderOutput::class),
+            $paginatedResults->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResults);
     }
 
     /**
@@ -55,35 +58,17 @@ readonly class OrderService
      *
      * @param OrderCreateInput $input
      * @return OrderOutput
-     * @throws UnprocessableEntityHttpException
      */
     public function create(OrderCreateInput $input): OrderOutput
     {
         $customer = $this->customerRepository->find($input->customerId);
         if (!$customer) {
-            throw new UnprocessableEntityHttpException("Customer with id {$input->customerId} not found.");
+            throw new CustomerNotFoundException($input->customerId);
         }
 
         $order = new Order();
 
-        $totalOrder = '0.00';
-
-        foreach ($input->products as $orderProductDTO) {
-            $product = $this->productRepository->find($orderProductDTO->productId);
-            if (!$product) {
-                throw new UnprocessableEntityHttpException("Product with id {$orderProductDTO->productId} not found.");
-            }
-
-            $subTotal = bcmul($product->getPrice(), (string)$orderProductDTO->quantity, 2);
-            $totalOrder = bcadd($totalOrder, $subTotal, 2);
-
-            $orderProduct = (new OrderProduct())
-                ->setProduct($product)
-                ->setQuantity($orderProductDTO->quantity)
-                ->setSubtotal($subTotal);
-
-            $order->addOrderProduct($orderProduct);
-        }
+        $totalOrder = $this->allocateProductsToOrder($order, $input->products);
 
         $order
             ->setCustomer($customer)
@@ -92,7 +77,7 @@ readonly class OrderService
 
         $this->orderRepository->save($order, true);
 
-        return new OrderOutput($order);
+        return $this->mapper->map($order, OrderOutput::class);
     }
 
     /**
@@ -108,6 +93,30 @@ readonly class OrderService
 
         $this->orderRepository->save($order);
 
-        return new OrderOutput($order);
+        return $this->mapper->map($order, OrderOutput::class);
+    }
+
+    private function allocateProductsToOrder(Order $order, array $products): string
+    {
+        $totalOrder = '0.00';
+
+        foreach ($products as $orderProductDto) {
+            $product = $this->productRepository->find($orderProductDto->productId);
+            if (!$product) {
+                throw new ProductNotFoundException($orderProductDto->productId);
+            }
+
+            $subtotal = bcmul($product->getPrice(), (string)$orderProductDto->quantity, 2);
+            $totalOrder = bcadd($totalOrder, $subtotal, 2);
+
+            $orderProduct = (new OrderProduct())
+                ->setProduct($product)
+                ->setQuantity($orderProductDto->quantity)
+                ->setSubtotal($subtotal);
+
+            $order->addOrderProduct($orderProduct);
+        }
+
+        return $totalOrder;
     }
 }

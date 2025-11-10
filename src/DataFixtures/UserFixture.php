@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\DTO\Input\User\UserCreateInput;
+use App\Dto\Input\User\UserCreateInput;
 use App\Enum\Role;
 use App\Service\UserService;
 use Doctrine\Bundle\FixturesBundle\Fixture;

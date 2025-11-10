@@ -2,22 +2,24 @@
 
 namespace App\Service;
 
-use App\DTO\Input\PaginationOptions;
-use App\DTO\Input\Product\ProductCreateInput;
-use App\DTO\Input\Product\ProductFilterInput;
-use App\DTO\Input\Product\ProductUpdateInput;
-use App\DTO\Output\PaginatedList;
-use App\DTO\Output\Product\ProductOutput;
+use App\Dto\Input\PaginationOptions;
+use App\Dto\Input\Product\ProductCreateInput;
+use App\Dto\Input\Product\ProductFilterInput;
+use App\Dto\Input\Product\ProductUpdateInput;
+use App\Dto\Output\Pagination\PaginatedList;
+use App\Dto\Output\Product\ProductOutput;
 use App\Entity\Product;
 use App\Enum\ProductCategory;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 readonly class ProductService
 {
     public function __construct(
         private ProductRepository  $productRepository,
         private PaginatorInterface $paginator,
+        private ObjectMapperInterface $mapper,
     )
     {
     }
@@ -31,18 +33,18 @@ readonly class ProductService
      */
     public function findAllPaginated(PaginationOptions $pagination, ?ProductFilterInput $filters = null): PaginatedList
     {
-        $pagination = $this->paginator->paginate(
+        $paginatedResults = $this->paginator->paginate(
             $this->productRepository->findFilteredQuery($filters),
             $pagination->page,
             $pagination->size
         );
 
-        $pagination->setItems(array_map(
-            fn(Product $product) => new ProductOutput($product),
-            $pagination->getItems()
+        $paginatedResults->setItems(array_map(
+            fn(Product $product) => $this->mapper->map($product, ProductOutput::class),
+            $paginatedResults->getItems()
         ));
 
-        return new PaginatedList($pagination);
+        return new PaginatedList($paginatedResults);
     }
 
     /**
@@ -60,7 +62,7 @@ readonly class ProductService
 
         $this->productRepository->save($product, true);
 
-        return new ProductOutput($product);
+        return $this->mapper->map($product, ProductOutput::class);
     }
 
     /**
@@ -78,7 +80,7 @@ readonly class ProductService
 
         $this->productRepository->save($product, true);
 
-        return new ProductOutput($product);
+        return $this->mapper->map($product, ProductOutput::class);
     }
 
     /**
