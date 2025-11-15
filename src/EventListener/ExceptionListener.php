@@ -19,7 +19,7 @@ final class ExceptionListener
 
         $status = $e instanceof HttpExceptionInterface
             ? $e->getStatusCode()
-            : ($this->getStatusFromAttribute($e) ?? 500);
+            : $this->getStatusFromAttribute($e) ?? 500;
 
         $error = [
             'title' => $e::class,
@@ -43,9 +43,16 @@ final class ExceptionListener
 
     private function extractValidationException(\Throwable $e): ?ValidationFailedException
     {
-        return $e instanceof ValidationFailedException
-            ? $e
-            : ($e->getPrevious() instanceof ValidationFailedException ? $e->getPrevious() : null);
+        if ($e instanceof ValidationFailedException) {
+            return $e;
+        }
+
+        $previous = $e->getPrevious();
+        if ($previous instanceof ValidationFailedException) {
+            return $previous;
+        }
+
+        return null;
     }
 
     private function formatViolations(ValidationFailedException $e): array
@@ -74,7 +81,10 @@ final class ExceptionListener
 
     private function getStatusFromAttribute(object $e): ?int
     {
-        $attr = (new \ReflectionClass($e))->getAttributes(WithHttpStatus::class)[0] ?? null;
-        return $attr?->newInstance()?->status ?? null;
+        $attributes = (new \ReflectionClass($e))->getAttributes(WithHttpStatus::class);
+        if (empty($attributes)) {
+            return null;
+        }
+        return $attributes[0]->getArguments()[0] ?? null;
     }
 }
