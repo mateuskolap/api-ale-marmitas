@@ -13,6 +13,6 @@ class ProductNotFoundException extends \DomainException
 {
     public function __construct(int $id)
     {
-        parent::__construct("Product with id {$id} not found.");
+        parent::__construct("Product with id '{$id}' not found.");
     }
 }

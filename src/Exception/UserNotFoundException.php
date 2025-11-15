@@ -13,6 +13,6 @@ class UserNotFoundException extends \DomainException
 {
     public function __construct(int $id)
     {
-        parent::__construct("User with id {$id} not found.");
+        parent::__construct("User with id '{$id}' not found.");
     }
 }

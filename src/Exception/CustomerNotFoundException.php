@@ -13,6 +13,6 @@ class CustomerNotFoundException extends \DomainException
 {
     public function __construct(int $id)
     {
-        parent::__construct("Customer with id {$id} not found.");
+        parent::__construct("Customer with id '{$id}' not found.");
     }
 }

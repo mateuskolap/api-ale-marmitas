@@ -13,6 +13,6 @@ class PaymentNotFoundException extends \DomainException
 {
     public function __construct(int $id)
     {
-        parent::__construct("Payment with id {$id} not found.");
+        parent::__construct("Payment with id '{$id}' not found.");
     }
 }

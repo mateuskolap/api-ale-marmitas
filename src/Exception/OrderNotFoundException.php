@@ -13,6 +13,6 @@ class OrderNotFoundException extends \DomainException
 {
     public function __construct(int $id)
     {
-        parent::__construct("Order with id {$id} not found.");
+        parent::__construct("Order with id '{$id}' not found.");
     }
 }
