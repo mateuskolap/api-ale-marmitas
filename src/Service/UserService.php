@@ -96,7 +96,14 @@ readonly class UserService
      */
     public function update(UserUpdateInput $input, User $user): UserOutput
     {
-        $input->email && $user->setEmail($input->email);
+        if ($input->email) {
+            $existingUser = $this->userRepository->findOneBy(['email' => $input->email]);
+            if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                throw new EmailAlreadyExistsException($input->email);
+            }
+            $user->setEmail($input->email);
+        }
+
         $input->roles && $user->setRoles($input->roles);
         $input->password && $user->setPassword($this->hasher->hashPassword($user, $input->password));
 
