@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\Customer\CustomerCreateInput;
 use App\Dto\Input\Customer\CustomerFilterInput;
 use App\Dto\Input\Customer\CustomerUpdateInput;
-use App\Entity\Customer;
 use App\Enum\Role;
 use App\Service\CustomerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,16 +43,16 @@ final class CustomerController extends AbstractController
         return $this->json($this->customerService->create($input), Response::HTTP_CREATED);
     }
 
-    #[Route('/{customer}', name: 'update', methods: ['PATCH'])]
-    public function update(#[MapRequestPayload] CustomerUpdateInput $input, Customer $customer): JsonResponse
+    #[Route('/{id}', name: 'update', methods: ['PATCH'])]
+    public function update(#[MapRequestPayload] CustomerUpdateInput $input, int $id): JsonResponse
     {
-        return $this->json($this->customerService->update($input, $customer));
+        return $this->json($this->customerService->update($input, $id));
     }
 
-    #[Route('/{customer}', name: 'delete', methods: ['DELETE'])]
-    public function delete(Customer $customer): JsonResponse
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
     {
-        $this->customerService->delete($customer);
+        $this->customerService->delete($id);
 
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }

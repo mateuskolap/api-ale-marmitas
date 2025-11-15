@@ -84,11 +84,16 @@ readonly class ProductService
      * Update an existing product
      *
      * @param ProductUpdateInput $input
-     * @param Product $product
+     * @param int $productId
      * @return ProductOutput
      */
-    public function update(ProductUpdateInput $input, Product $product): ProductOutput
+    public function update(ProductUpdateInput $input, int $productId): ProductOutput
     {
+        $product = $this->productRepository->find($productId);
+        if (!$product) {
+            throw new ProductNotFoundException($productId);
+        }
+
         $input->name && $product->setName($input->name);
         $input->price && $product->setPrice($input->price);
         $input->category && $product->setCategory(ProductCategory::from($input->category));
@@ -101,11 +106,16 @@ readonly class ProductService
     /**
      * Delete a product
      *
-     * @param Product $product
+     * @param int $productId
      * @return void
      */
-    public function delete(Product $product): void
+    public function delete(int $productId): void
     {
+        $product = $this->productRepository->find($productId);
+        if (!$product) {
+            throw new ProductNotFoundException($productId);
+        }
+
         $this->productRepository->delete($product, true);
     }
 }

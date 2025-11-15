@@ -110,11 +110,16 @@ readonly class PaymentService
      * Update an existing payment.
      *
      * @param PaymentUpdateInput $input
-     * @param Payment $payment
+     * @param int $paymentId
      * @return PaymentOutput
      */
-    public function update(PaymentUpdateInput $input, Payment $payment): PaymentOutput
+    public function update(PaymentUpdateInput $input, int $paymentId): PaymentOutput
     {
+        $payment = $this->paymentRepository->find($paymentId);
+        if (!$payment) {
+            throw new PaymentNotFoundException($paymentId);
+        }
+
         $input->date && $payment->setDate($input->date);
         $input->method && $payment->setMethod(PaymentMethod::from($input->method));
         $input->notes && $payment->setNotes($input->notes);
@@ -127,11 +132,16 @@ readonly class PaymentService
     /**
      * Delete a payment.
      *
-     * @param Payment $payment
+     * @param int $paymentId
      * @return void
      */
-    public function delete(Payment $payment): void
+    public function delete(int $paymentId): void
     {
+        $payment = $this->paymentRepository->find($paymentId);
+        if (!$payment) {
+            throw new PaymentNotFoundException($paymentId);
+        }
+
         $this->paymentRepository->remove($payment, true);
     }
 

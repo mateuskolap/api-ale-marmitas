@@ -98,12 +98,17 @@ readonly class OrderService
     /**
      * Update the status of an order
      *
-     * @param Order $order
+     * @param int $orderId
      * @param OrderStatus $status
      * @return OrderOutput
      */
-    public function updateStatus(Order $order, OrderStatus $status): OrderOutput
+    public function updateStatus(int $orderId, OrderStatus $status): OrderOutput
     {
+        $order = $this->orderRepository->find($orderId);
+        if (!$order) {
+            throw new OrderNotFoundException($orderId);
+        }
+
         $order->setStatus($status);
 
         $this->orderRepository->save($order);

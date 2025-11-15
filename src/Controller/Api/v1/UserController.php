@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\User\UserCreateInput;
 use App\Dto\Input\User\UserFilterInput;
 use App\Dto\Input\User\UserUpdateInput;
-use App\Entity\User;
 use App\Enum\Role;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,16 +43,16 @@ final class UserController extends AbstractController
         return $this->json($this->userService->create($input), Response::HTTP_CREATED);
     }
 
-    #[Route('/{user}', name: 'update', methods: ['PATCH'])]
-    public function update(#[MapRequestPayload] UserUpdateInput $input, User $user): JsonResponse
+    #[Route('/{id}', name: 'update', methods: ['PATCH'])]
+    public function update(#[MapRequestPayload] UserUpdateInput $input, int $id): JsonResponse
     {
-        return $this->json($this->userService->update($input, $user));
+        return $this->json($this->userService->update($input, $id));
     }
 
-    #[Route('/{user}', name: 'delete', methods: ['DELETE'])]
-    public function delete(User $user): JsonResponse
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
     {
-        $this->userService->delete($user);
+        $this->userService->delete($id);
 
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }

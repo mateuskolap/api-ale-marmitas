@@ -89,11 +89,16 @@ readonly class UserService
      * Update an existing user
      *
      * @param UserUpdateInput $input
-     * @param User $user
+     * @param int $userId
      * @return UserOutput
      */
-    public function update(UserUpdateInput $input, User $user): UserOutput
+    public function update(UserUpdateInput $input, int $userId): UserOutput
     {
+        $user = $this->userRepository->find($userId);
+        if (!$user) {
+            throw new UserNotFoundException($userId);
+        }
+
         if ($input->email) {
             $existingUser = $this->userRepository->findOneBy(['email' => $input->email]);
             if ($existingUser && $existingUser->getId() !== $user->getId()) {
@@ -113,10 +118,15 @@ readonly class UserService
     /**
      * Delete a user
      *
-     * @param User $user
+     * @param int $userId
      */
-    public function delete(User $user): void
+    public function delete(int $userId): void
     {
+        $user = $this->userRepository->find($userId);
+        if (!$user) {
+            throw new UserNotFoundException($userId);
+        }
+
         $this->userRepository->delete($user, true);
     }
 }

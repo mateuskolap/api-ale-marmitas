@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\Order\OrderCreateInput;
 use App\Dto\Input\Order\OrderFilterInput;
 use App\Dto\Input\Order\OrderStatusUpdateInput;
-use App\Entity\Order;
 use App\Enum\OrderStatus;
 use App\Enum\Role;
 use App\Service\OrderService;
@@ -45,9 +44,9 @@ final class OrderController extends AbstractController
         return $this->json($this->orderService->create($input), Response::HTTP_CREATED);
     }
 
-    #[Route('/{order}/status', name: 'update_status', methods: ['PATCH'])]
-    public function updateStatus(Order $order, #[MapRequestPayload] OrderStatusUpdateInput $input): JsonResponse
+    #[Route('/{id}/status', name: 'update_status', methods: ['PATCH'])]
+    public function updateStatus(int $id, #[MapRequestPayload] OrderStatusUpdateInput $input): JsonResponse
     {
-        return $this->json($this->orderService->updateStatus($order, OrderStatus::from($input->status)));
+        return $this->json($this->orderService->updateStatus($id, OrderStatus::from($input->status)));
     }
 }

@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\Product\ProductCreateInput;
 use App\Dto\Input\Product\ProductFilterInput;
 use App\Dto\Input\Product\ProductUpdateInput;
-use App\Entity\Product;
 use App\Enum\Role;
 use App\Service\ProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,16 +43,16 @@ final class ProductController extends AbstractController
         return $this->json($this->productService->create($input), Response::HTTP_CREATED);
     }
 
-    #[Route('/{product}', name: 'update', methods: ['PATCH'])]
-    public function update(#[MapRequestPayload] ProductUpdateInput $input, Product $product): JsonResponse
+    #[Route('/{id}', name: 'update', methods: ['PATCH'])]
+    public function update(#[MapRequestPayload] ProductUpdateInput $input, int $id): JsonResponse
     {
-        return $this->json($this->productService->update($input, $product));
+        return $this->json($this->productService->update($input, $id));
     }
 
-    #[Route('/{product}', name: 'delete', methods: ['DELETE'])]
-    public function delete(Product $product): JsonResponse
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
     {
-        $this->productService->delete($product);
+        $this->productService->delete($id);
 
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }

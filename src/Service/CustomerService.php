@@ -83,11 +83,16 @@ readonly class CustomerService
      * Update an existing customer
      *
      * @param CustomerUpdateInput $input
-     * @param Customer $customer
+     * @param int $customerId
      * @return CustomerOutput
      */
-    public function update(CustomerUpdateInput $input, Customer $customer): CustomerOutput
+    public function update(CustomerUpdateInput $input, int $customerId): CustomerOutput
     {
+        $customer = $this->customerRepository->find($customerId);
+        if (!$customer) {
+            throw new CustomerNotFoundException($customerId);
+        }
+
         $input->name && $customer->setName($input->name);
         $input->email && $customer->setEmail($input->email);
         $input->phone && $customer->setPhone($input->phone);
@@ -100,11 +105,16 @@ readonly class CustomerService
     /**
      * Delete a customer
      *
-     * @param Customer $customer
+     * @param int $customerId
      * @return void
      */
-    public function delete(Customer $customer): void
+    public function delete(int $customerId): void
     {
+        $customer = $this->customerRepository->find($customerId);
+        if (!$customer) {
+            throw new CustomerNotFoundException($customerId);
+        }
+
         $this->customerRepository->delete($customer, true);
     }
 }

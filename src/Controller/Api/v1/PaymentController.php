@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
 use App\Dto\Input\Payment\PaymentUpdateInput;
-use App\Entity\Payment;
 use App\Enum\Role;
 use App\Service\PaymentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,16 +43,16 @@ final class PaymentController extends AbstractController
         return $this->json($this->paymentService->create($input), Response::HTTP_CREATED);
     }
 
-    #[Route('/{payment}', name: 'update', methods: ['PATCH'])]
-    public function update(#[MapRequestPayload] PaymentUpdateInput $input, Payment $payment): JsonResponse
+    #[Route('/{id}', name: 'update', methods: ['PATCH'])]
+    public function update(#[MapRequestPayload] PaymentUpdateInput $input, int $id): JsonResponse
     {
-        return $this->json($this->paymentService->update($input, $payment));
+        return $this->json($this->paymentService->update($input, $id));
     }
 
-    #[Route('/{payment}', name: 'delete', methods: ['DELETE'])]
-    public function delete(Payment $payment): JsonResponse
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
     {
-        $this->paymentService->delete($payment);
+        $this->paymentService->delete($id);
 
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
