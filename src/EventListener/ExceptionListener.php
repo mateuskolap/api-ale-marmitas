@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -28,6 +29,7 @@ final class ExceptionListener
         $validationException = $this->extractValidationException($e);
 
         if ($validationException) {
+            $status = Response::HTTP_UNPROCESSABLE_ENTITY;
             $error['errors'] = $this->formatViolations($validationException);
         } else {
             $this->setMessageOrLines($error, $e->getMessage());
