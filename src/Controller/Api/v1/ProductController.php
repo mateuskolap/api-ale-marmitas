@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api\v1;
 
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Product\ProductCreateInput;
 use App\Dto\Input\Product\ProductFilterInput;
 use App\Dto\Input\Product\ProductUpdateInput;
@@ -28,12 +27,9 @@ final class ProductController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(
-        #[MapQueryString] PaginationOptions  $pagination,
-        #[MapQueryString] ProductFilterInput $filters,
-    ): JsonResponse
+    public function list(#[MapQueryString] ProductFilterInput $filters): JsonResponse
     {
-        return $this->json($this->productService->findAllPaginated($pagination, $filters));
+        return $this->json($this->productService->findAllPaginated($filters));
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

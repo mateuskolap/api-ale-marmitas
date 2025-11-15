@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Product\ProductCreateInput;
 use App\Dto\Input\Product\ProductFilterInput;
 use App\Dto\Input\Product\ProductUpdateInput;
@@ -44,16 +43,15 @@ readonly class ProductService
     /**
      * Find all products with pagination
      *
-     * @param PaginationOptions $pagination
-     * @param ProductFilterInput|null $filters
+     * @param ProductFilterInput $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $pagination, ?ProductFilterInput $filters = null): PaginatedList
+    public function findAllPaginated(ProductFilterInput $filters): PaginatedList
     {
         $paginatedResults = $this->paginator->paginate(
             $this->productRepository->findFilteredQuery($filters),
-            $pagination->page,
-            $pagination->size
+            $filters->page,
+            $filters->size
         );
 
         $paginatedResults->setItems(array_map(

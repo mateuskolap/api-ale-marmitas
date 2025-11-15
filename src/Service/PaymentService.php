@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
 use App\Dto\Input\Payment\PaymentUpdateInput;
@@ -52,16 +51,15 @@ readonly class PaymentService
     /**
      * Find all payments with pagination.
      *
-     * @param PaginationOptions $pagination
-     * @param PaymentFilterInput|null $filters
+     * @param PaymentFilterInput $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $pagination, ?PaymentFilterInput $filters = null): PaginatedList
+    public function findAllPaginated(PaymentFilterInput $filters): PaginatedList
     {
         $paginatedResults = $this->paginator->paginate(
             $this->paymentRepository->findFilteredQuery($filters),
-            $pagination->page,
-            $pagination->size
+            $filters->page,
+            $filters->size
         );
 
         $paginatedResults->setItems(array_map(

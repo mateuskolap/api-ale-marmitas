@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\Order\OrderCreateInput;
 use App\Dto\Input\Order\OrderFilterInput;
 use App\Dto\Input\Order\OrderStatusUpdateInput;
-use App\Dto\Input\PaginationOptions;
 use App\Entity\Order;
 use App\Enum\OrderStatus;
 use App\Enum\Role;
@@ -29,12 +28,9 @@ final class OrderController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(
-        #[MapQueryString] PaginationOptions $pagination,
-        #[MapQueryString] OrderFilterInput  $filters,
-    ): JsonResponse
+    public function list(#[MapQueryString] OrderFilterInput $filters): JsonResponse
     {
-        return $this->json($this->orderService->findAllPaginated($pagination, $filters));
+        return $this->json($this->orderService->findAllPaginated($filters));
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

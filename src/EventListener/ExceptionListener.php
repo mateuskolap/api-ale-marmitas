@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -26,6 +27,7 @@ final class ExceptionListener
         ];
 
         if ($previous instanceof ValidationFailedException) {
+            $status = Response::HTTP_UNPROCESSABLE_ENTITY;
             $details = [
                 'detail' => 'Validation Error.',
                 'errors' => [],

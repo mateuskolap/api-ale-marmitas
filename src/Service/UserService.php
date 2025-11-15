@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\User\UserCreateInput;
 use App\Dto\Input\User\UserFilterInput;
 use App\Dto\Input\User\UserUpdateInput;
@@ -46,16 +45,15 @@ readonly class UserService
     /**
      * Find all users with pagination
      *
-     * @param PaginationOptions $pagination
-     * @param UserFilterInput|null $filters
+     * @param UserFilterInput $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $pagination, ?UserFilterInput $filters = null): PaginatedList
+    public function findAllPaginated(UserFilterInput $filters): PaginatedList
     {
         $paginatedResults = $this->paginator->paginate(
             $this->userRepository->findFilteredQuery($filters),
-            $pagination->page,
-            $pagination->size
+            $filters->page,
+            $filters->size
         );
 
         $paginatedResults->setItems(array_map(

@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api\v1;
 
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\User\UserCreateInput;
 use App\Dto\Input\User\UserFilterInput;
 use App\Dto\Input\User\UserUpdateInput;
@@ -28,12 +27,9 @@ final class UserController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(
-        #[MapQueryString] PaginationOptions $pagination,
-        #[MapQueryString] UserFilterInput   $filters,
-    ): JsonResponse
+    public function list(#[MapQueryString] UserFilterInput $filters): JsonResponse
     {
-        return $this->json($this->userService->findAllPaginated($pagination, $filters));
+        return $this->json($this->userService->findAllPaginated($filters));
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

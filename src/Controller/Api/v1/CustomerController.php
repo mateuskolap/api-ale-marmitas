@@ -5,7 +5,6 @@ namespace App\Controller\Api\v1;
 use App\Dto\Input\Customer\CustomerCreateInput;
 use App\Dto\Input\Customer\CustomerFilterInput;
 use App\Dto\Input\Customer\CustomerUpdateInput;
-use App\Dto\Input\PaginationOptions;
 use App\Entity\Customer;
 use App\Enum\Role;
 use App\Service\CustomerService;
@@ -28,12 +27,9 @@ final class CustomerController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(
-        #[MapQueryString] PaginationOptions   $pagination,
-        #[MapQueryString] CustomerFilterInput $filters,
-    ): JsonResponse
+    public function list(#[MapQueryString] CustomerFilterInput $filters): JsonResponse
     {
-        return $this->json($this->customerService->findAllPaginated($pagination, $filters));
+        return $this->json($this->customerService->findAllPaginated($filters));
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

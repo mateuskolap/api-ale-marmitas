@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Dto\Input\Order\OrderCreateInput;
 use App\Dto\Input\Order\OrderFilterInput;
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Output\Order\OrderOutput;
 use App\Dto\Output\Pagination\PaginatedList;
 use App\Entity\Order;
@@ -50,16 +49,15 @@ readonly class OrderService
     /**
      * Find all orders with pagination
      *
-     * @param PaginationOptions $pagination
-     * @param OrderFilterInput|null $filters
+     * @param OrderFilterInput $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $pagination, ?OrderFilterInput $filters = null): PaginatedList
+    public function findAllPaginated(OrderFilterInput $filters): PaginatedList
     {
         $paginatedResults = $this->paginator->paginate(
             $this->orderRepository->findFilteredQuery($filters),
-            $pagination->page,
-            $pagination->size
+            $filters->page,
+            $filters->size
         );
 
         $paginatedResults->setItems(array_map(

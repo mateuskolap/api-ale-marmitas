@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api\v1;
 
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
 use App\Dto\Input\Payment\PaymentUpdateInput;
@@ -28,12 +27,9 @@ final class PaymentController extends AbstractController
     }
 
     #[Route(name: 'list', methods: ['GET'])]
-    public function list(
-        #[MapQueryString] PaginationOptions  $pagination,
-        #[MapQueryString] PaymentFilterInput $filters,
-    ): JsonResponse
+    public function list(#[MapQueryString] PaymentFilterInput $filters): JsonResponse
     {
-        return $this->json($this->paymentService->findAllPaginated($pagination, $filters));
+        return $this->json($this->paymentService->findAllPaginated($filters));
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

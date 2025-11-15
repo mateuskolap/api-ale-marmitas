@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Dto\Input\Customer\CustomerCreateInput;
 use App\Dto\Input\Customer\CustomerFilterInput;
 use App\Dto\Input\Customer\CustomerUpdateInput;
-use App\Dto\Input\PaginationOptions;
 use App\Dto\Output\Customer\CustomerOutput;
 use App\Dto\Output\Pagination\PaginatedList;
 use App\Entity\Customer;
@@ -43,16 +42,15 @@ readonly class CustomerService
     /**
      * Find all customers with pagination
      *
-     * @param PaginationOptions $pagination
      * @param CustomerFilterInput|null $filters
      * @return PaginatedList
      */
-    public function findAllPaginated(PaginationOptions $pagination, ?CustomerFilterInput $filters = null): PaginatedList
+    public function findAllPaginated(CustomerFilterInput $filters = null): PaginatedList
     {
         $paginatedResult = $this->paginator->paginate(
             $this->customerRepository->findFilteredQuery($filters),
-            $pagination->page,
-            $pagination->size
+            $filters->page,
+            $filters->size
         );
 
         $paginatedResult->setItems(array_map(
