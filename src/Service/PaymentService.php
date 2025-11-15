@@ -13,6 +13,7 @@ use App\Entity\Payment;
 use App\Enum\PaymentMethod;
 use App\Exception\CustomerNotFoundException;
 use App\Exception\NoOrdersToAllocatePaymentException;
+use App\Exception\PaymentNotFoundException;
 use App\Repository\CustomerRepository;
 use App\Repository\OrderRepository;
 use App\Repository\PaymentRepository;
@@ -35,11 +36,16 @@ readonly class PaymentService
     /**
      * Show a single payment.
      *
-     * @param Payment $payment
+     * @param int $id
      * @return PaymentOutput
      */
-    public function show(Payment $payment): PaymentOutput
+    public function show(int $id): PaymentOutput
     {
+        $payment = $this->paymentRepository->find($id);
+        if (!$payment) {
+            throw new PaymentNotFoundException($id);
+        }
+
         return $this->mapper->map($payment, PaymentOutput::class);
     }
 

@@ -36,10 +36,10 @@ final class PaymentController extends AbstractController
         return $this->json($this->paymentService->findAllPaginated($pagination, $filters));
     }
 
-    #[Route('/{payment}', name: 'show', methods: ['GET'])]
-    public function show(Payment $payment): JsonResponse
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
     {
-        return $this->json($this->paymentService->show($payment));
+        return $this->json($this->paymentService->show($id));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

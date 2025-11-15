@@ -10,6 +10,7 @@ use App\Dto\Output\Pagination\PaginatedList;
 use App\Dto\Output\Product\ProductOutput;
 use App\Entity\Product;
 use App\Enum\ProductCategory;
+use App\Exception\ProductNotFoundException;
 use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -27,11 +28,16 @@ readonly class ProductService
     /**
      * Show a single product
      *
-     * @param Product $product
+     * @param int $id
      * @return ProductOutput
      */
-    public function show(Product $product): ProductOutput
+    public function show(int $id): ProductOutput
     {
+        $product = $this->productRepository->find($id);
+        if (!$product) {
+            throw new ProductNotFoundException($id);
+        }
+
         return $this->mapper->map($product, ProductOutput::class);
     }
 

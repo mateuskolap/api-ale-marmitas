@@ -36,10 +36,10 @@ final class CustomerController extends AbstractController
         return $this->json($this->customerService->findAllPaginated($pagination, $filters));
     }
 
-    #[Route('/{customer}', name: 'show', methods: ['GET'])]
-    public function show(Customer $customer): JsonResponse
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
     {
-        return $this->json($this->customerService->show($customer));
+        return $this->json($this->customerService->show($id));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

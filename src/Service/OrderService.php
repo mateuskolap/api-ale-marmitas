@@ -11,6 +11,7 @@ use App\Entity\Order;
 use App\Entity\OrderProduct;
 use App\Enum\OrderStatus;
 use App\Exception\CustomerNotFoundException;
+use App\Exception\OrderNotFoundException;
 use App\Exception\ProductNotFoundException;
 use App\Repository\CustomerRepository;
 use App\Repository\OrderRepository;
@@ -33,11 +34,16 @@ readonly class OrderService
     /**
      * Show order details
      *
-     * @param Order $order
+     * @param int $id
      * @return OrderOutput
      */
-    public function show(Order $order): OrderOutput
+    public function show(int $id): OrderOutput
     {
+        $order = $this->orderRepository->find($id);
+        if (!$order) {
+            throw new OrderNotFoundException($id);
+        }
+
         return $this->mapper->map($order, OrderOutput::class);
     }
 

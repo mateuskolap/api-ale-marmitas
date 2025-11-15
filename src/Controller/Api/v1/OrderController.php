@@ -37,10 +37,10 @@ final class OrderController extends AbstractController
         return $this->json($this->orderService->findAllPaginated($pagination, $filters));
     }
 
-    #[Route('/{order}', name: 'show', methods: ['GET'])]
-    public function show(Order $order): JsonResponse
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
     {
-        return $this->json($this->orderService->show($order));
+        return $this->json($this->orderService->show($id));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

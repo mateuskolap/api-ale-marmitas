@@ -9,6 +9,7 @@ use App\Dto\Input\PaginationOptions;
 use App\Dto\Output\Customer\CustomerOutput;
 use App\Dto\Output\Pagination\PaginatedList;
 use App\Entity\Customer;
+use App\Exception\CustomerNotFoundException;
 use App\Repository\CustomerRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -26,11 +27,16 @@ readonly class CustomerService
     /**
      * Show a single customer
      *
-     * @param Customer $customer
+     * @param int $id
      * @return CustomerOutput
      */
-    public function show(Customer $customer): CustomerOutput
+    public function show(int $id): CustomerOutput
     {
+        $customer = $this->customerRepository->find($id);
+        if (!$customer) {
+            throw new CustomerNotFoundException($id);
+        }
+
         return $this->mapper->map($customer, new CustomerOutput());
     }
 

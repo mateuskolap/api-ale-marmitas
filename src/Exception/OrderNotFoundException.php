@@ -9,10 +9,10 @@ use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 
 #[WithLogLevel(LogLevel::INFO)]
 #[WithHttpStatus(Response::HTTP_NOT_FOUND)]
-class ProductNotFoundException extends \DomainException
+class OrderNotFoundException extends \DomainException
 {
     public function __construct(int $id)
     {
-        parent::__construct("Product with id {$id} not found.");
+        parent::__construct("Order with id {$id} not found.");
     }
 }

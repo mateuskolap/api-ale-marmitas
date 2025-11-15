@@ -11,8 +11,8 @@ use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 #[WithHttpStatus(Response::HTTP_NOT_FOUND)]
 class CustomerNotFoundException extends \DomainException
 {
-    public function __construct(int $customerId)
+    public function __construct(int $id)
     {
-        parent::__construct("Customer with id {$customerId} not found.");
+        parent::__construct("Customer with id {$id} not found.");
     }
 }

@@ -36,10 +36,10 @@ final class ProductController extends AbstractController
         return $this->json($this->productService->findAllPaginated($pagination, $filters));
     }
 
-    #[Route('/{product}', name: 'show', methods: ['GET'])]
-    public function show(Product $product): JsonResponse
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
     {
-        return $this->json($this->productService->show($product));
+        return $this->json($this->productService->show($id));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

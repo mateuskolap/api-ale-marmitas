@@ -36,10 +36,10 @@ final class UserController extends AbstractController
         return $this->json($this->userService->findAllPaginated($pagination, $filters));
     }
 
-    #[Route('/{user}', name: 'show', methods: ['GET'])]
-    public function show(User $user): JsonResponse
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
     {
-        return $this->json($this->userService->show($user));
+        return $this->json($this->userService->show($id));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

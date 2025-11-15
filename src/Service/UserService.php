@@ -10,6 +10,7 @@ use App\Dto\Output\Pagination\PaginatedList;
 use App\Dto\Output\User\UserOutput;
 use App\Entity\User;
 use App\Exception\EmailAlreadyExistsException;
+use App\Exception\UserNotFoundException;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -29,11 +30,16 @@ readonly class UserService
     /**
      * Show a single user
      *
-     * @param User $user
+     * @param int $id
      * @return UserOutput
      */
-    public function show(User $user): UserOutput
+    public function show(int $id): UserOutput
     {
+        $user = $this->userRepository->find($id);
+        if (!$user) {
+            throw new UserNotFoundException($id);
+        }
+
         return $this->mapper->map($user, UserOutput::class);
     }
 
