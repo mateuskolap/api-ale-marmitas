@@ -6,7 +6,6 @@ use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Payment\PaymentCreateInput;
 use App\Dto\Input\Payment\PaymentFilterInput;
 use App\Dto\Input\Payment\PaymentUpdateInput;
-use App\Dto\Output\Payment\PaymentOutput;
 use App\Entity\Payment;
 use App\Enum\Role;
 use App\Service\PaymentService;
@@ -15,7 +14,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -24,8 +22,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class PaymentController extends AbstractController
 {
     public function __construct(
-        private readonly PaymentService        $paymentService,
-        private readonly ObjectMapperInterface $mapper,
+        private readonly PaymentService $paymentService,
     )
     {
     }
@@ -42,7 +39,7 @@ final class PaymentController extends AbstractController
     #[Route('/{payment}', name: 'show', methods: ['GET'])]
     public function show(Payment $payment): JsonResponse
     {
-        return $this->json($this->mapper->map($payment, PaymentOutput::class));
+        return $this->json($this->paymentService->show($payment));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

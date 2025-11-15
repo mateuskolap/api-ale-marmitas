@@ -6,7 +6,6 @@ use App\Dto\Input\PaginationOptions;
 use App\Dto\Input\Product\ProductCreateInput;
 use App\Dto\Input\Product\ProductFilterInput;
 use App\Dto\Input\Product\ProductUpdateInput;
-use App\Dto\Output\Product\ProductOutput;
 use App\Entity\Product;
 use App\Enum\Role;
 use App\Service\ProductService;
@@ -15,7 +14,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -25,7 +23,6 @@ final class ProductController extends AbstractController
 {
     public function __construct(
         private readonly ProductService $productService,
-        private readonly ObjectMapperInterface $mapper,
     )
     {
     }
@@ -42,7 +39,7 @@ final class ProductController extends AbstractController
     #[Route('/{product}', name: 'show', methods: ['GET'])]
     public function show(Product $product): JsonResponse
     {
-        return $this->json($this->mapper->map($product, ProductOutput::class));
+        return $this->json($this->productService->show($product));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

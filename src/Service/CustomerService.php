@@ -24,6 +24,17 @@ readonly class CustomerService
     }
 
     /**
+     * Show a single customer
+     *
+     * @param Customer $customer
+     * @return CustomerOutput
+     */
+    public function show(Customer $customer): CustomerOutput
+    {
+        return $this->mapper->map($customer, new CustomerOutput());
+    }
+
+    /**
      * Find all customers with pagination
      *
      * @param PaginationOptions $pagination

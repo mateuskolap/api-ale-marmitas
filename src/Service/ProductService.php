@@ -17,11 +17,22 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 readonly class ProductService
 {
     public function __construct(
-        private ProductRepository  $productRepository,
-        private PaginatorInterface $paginator,
+        private ProductRepository     $productRepository,
+        private PaginatorInterface    $paginator,
         private ObjectMapperInterface $mapper,
     )
     {
+    }
+
+    /**
+     * Show a single product
+     *
+     * @param Product $product
+     * @return ProductOutput
+     */
+    public function show(Product $product): ProductOutput
+    {
+        return $this->mapper->map($product, ProductOutput::class);
     }
 
     /**

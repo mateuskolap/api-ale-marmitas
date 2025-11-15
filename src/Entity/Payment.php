@@ -156,7 +156,6 @@ class Payment
     public function removeOrderPayment(OrderPayment $orderPayment): static
     {
         if ($this->orderPayments->removeElement($orderPayment)) {
-            // set the owning side to null (unless already changed)
             if ($orderPayment->getPayment() === $this) {
                 $orderPayment->setPayment(null);
             }

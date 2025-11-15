@@ -31,6 +31,17 @@ readonly class OrderService
     }
 
     /**
+     * Show order details
+     *
+     * @param Order $order
+     * @return OrderOutput
+     */
+    public function show(Order $order): OrderOutput
+    {
+        return $this->mapper->map($order, OrderOutput::class);
+    }
+
+    /**
      * Find all orders with pagination
      *
      * @param PaginationOptions $pagination

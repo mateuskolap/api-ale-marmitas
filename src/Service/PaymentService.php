@@ -33,6 +33,17 @@ readonly class PaymentService
     }
 
     /**
+     * Show a single payment.
+     *
+     * @param Payment $payment
+     * @return PaymentOutput
+     */
+    public function show(Payment $payment): PaymentOutput
+    {
+        return $this->mapper->map($payment, PaymentOutput::class);
+    }
+
+    /**
      * Find all payments with pagination.
      *
      * @param PaginationOptions $pagination

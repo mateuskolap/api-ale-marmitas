@@ -27,6 +27,17 @@ readonly class UserService
     }
 
     /**
+     * Show a single user
+     *
+     * @param User $user
+     * @return UserOutput
+     */
+    public function show(User $user): UserOutput
+    {
+        return $this->mapper->map($user, UserOutput::class);
+    }
+
+    /**
      * Find all users with pagination
      *
      * @param PaginationOptions $pagination
